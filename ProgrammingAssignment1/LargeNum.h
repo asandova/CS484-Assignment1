@@ -25,16 +25,18 @@ class LargeNum{
         friend ostream& operator<<(ostream& out, LargeNum& num);
 
         //Arithmatic operators
-        LargeNum operator+(const LargeNum& num2);
-        LargeNum operator-(const LargeNum& num2);
-        LargeNum operator*(const LargeNum& num2);
-        LargeNum operator/(const LargeNum& num2);
+        friend LargeNum operator+(const LargeNum& num1, const LargeNum& num2);
+        friend LargeNum operator-(const LargeNum& num1, const LargeNum& num2);
+        friend LargeNum operator*(const LargeNum& num1, const LargeNum& num2);
+        friend LargeNum operator/(const LargeNum& num1, const LargeNum& num2);
         
         //boolean Operators
-        bool operator==(const LargeNum& num2);
-        bool operator<=(const LargeNum& num2);
-        bool operator>=(const LargeNum& num2);
-        bool operator!=(const LargeNum& num2);
+        friend bool operator==(const LargeNum& num1, const LargeNum& num2);
+        friend bool operator<=(const LargeNum& num1, const LargeNum& num2);
+        friend bool operator>=(const LargeNum& num1, const LargeNum& num2);
+        friend bool operator!=(const LargeNum& num1, const LargeNum& num2);
+        friend bool operator<(const LargeNum& num1, const LargeNum& num2);
+        friend bool operator>(const LargeNum& num1, const LargeNum& num2);
 
         //conversion methods
         LargeNum toLarge(int n);
@@ -42,9 +44,11 @@ class LargeNum{
         int toInt();
         float toFloat();
 
+        void removeZeros();
+        void removeTailingZeros();
+        void removeLeadingZeros();
 private:
 		static bool validStr(string s);
-
 };
 
 #endif //LARGENUM_H
