@@ -118,7 +118,11 @@
     <Text Include="makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LargeNum.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LargeNum.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
