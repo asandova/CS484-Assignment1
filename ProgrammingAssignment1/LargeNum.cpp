@@ -5,6 +5,7 @@
 	Prurpose: Contains the class implemtation of the class LargeNum
 */
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include "LargeNum.h"
 
@@ -38,18 +39,27 @@ LargeNum::LargeNum(string strNum) {
 	}
 }
 LargeNum::LargeNum(float fnum) {
-	int Integer = (int)fnum;
-	char* temp;
-	itoa(Integer, temp, 10);
-	LN_Integer = string(temp);
+	ostringstream sfloat;
+	sfloat << fnum;
+	string fullFloat = string(sfloat.str());
 
-
+	for(int i = 0; i < fullFloat.size(); i++){
+		if(fullFloat[i] == '.'){
+			LN_Integer = fullFloat.substr(0, i);
+			LN_Fraction = fullFloat.substr(i+1, fullFloat.size());
+			return;
+		}
+	}
 }
 
 
 LargeNum LargeNum::pow(const LargeNum& num, int n) {
 	//add code here
-	return num;
+	LargeNum product = num;
+	for(int i = 1; i < n; i++){
+		product = num * product;
+	}
+	return product;
 }
 
 ostream& operator<<(ostream& out, LargeNum& num) {
@@ -58,7 +68,13 @@ ostream& operator<<(ostream& out, LargeNum& num) {
 }
 //Arithmatic operators
 LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
-	
+	LargeNum num1_copy = num1;
+	LargeNum num2_copy = num2;
+	LargeNum sum = LargeNum();
+	LargeNum::matchLength(num1_copy, num2_copy);
+
+	for
+
 }
 LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {}
 LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {}
@@ -207,9 +223,49 @@ void LargeNum::removeLeadingZeros(){
 	}
 }
 
+void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
+	int integerDiff, fractionDiff;
+	if( num1.getIntegerSize() > num2.getIntegerSize() ){
+		integerDiff = num1.getIntegerSize() - num2.getIntegerSize(); 
+		num2.addZerostoFront(integerDiff);
+	}
+	else if( num1.getIntegerSize() < num2.getIntegerSize() ){
+		integerDiff = num2.getIntegerSize() - num1.getIntegerSize(); 
+		num1.addZerostoFront(integerDiff);
+	}
+
+	if( num1.getFractionSize() > num2.getFractionSize() ){
+		fractionDiff = num1.getFractionSize() - num2.getFractionSize();
+		num2.addZerostoEnd(fractionDiff);
+	}
+	else if( num1.getFractionSize() < num2.getFractionSize() ){
+		fractionDiff = num2.getFractionSize() - num1.getFractionSize();
+		num1.addZerostoEnd(fractionDiff);
+	}
+}
+void LargeNum::addZerostoFront(int n){
+	string zeros = string(n,'0');
+	LN_Integer = zeros + LN_Integer;
+}
+void LargeNum::addZerostoEnd(int n){
+	for(int i = 0; i < n; i++ ){
+		LN_Fraction.push_back('0');
+	}
+}
+
 string LargeNum::getInteger() {
 	return LN_Integer;
 }
 string LargeNum::getFraction() {
 	return LN_Fraction;
+}
+
+int LargeNum::getIntegerSize() const{
+	return LN_Integer.size();
+}
+int LargeNum::getFractionSize() const{
+	return LN_Fraction.size();	
+}
+int LargeNum::Size(){
+	return LN_Integer.size() + LN_Fraction.size();
 }

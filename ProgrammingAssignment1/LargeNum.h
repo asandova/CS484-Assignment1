@@ -9,8 +9,8 @@ using namespace std;
 
 class LargeNum{
     private:
-    string LN_Integer;
-	string LN_Fraction;
+        string LN_Integer;
+        string LN_Fraction;
 
     public:
         //constructors
@@ -47,8 +47,14 @@ class LargeNum{
         void removeZeros();
         void removeTailingZeros();
         void removeLeadingZeros();
+        static void matchLength(LargeNum& num1, LargeNum& num2);
+        void addZerostoFront(int n);
+        void addZerostoEnd(int n);
 		string getInteger();
 		string getFraction();
+        int getIntegerSize() const;
+        int getFractionSize() const;
+        int Size();
 private:
 		static bool validStr(string s);
 };
