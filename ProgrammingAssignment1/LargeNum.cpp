@@ -1,4 +1,9 @@
-
+/*
+	File: LargeNum.cpp
+	Author: August B. Sandoval
+	Class: CS484
+	Prurpose: Contains the class implemtation of the class LargeNum
+*/
 #include <iostream>
 #include <stdio.h>
 #include "LargeNum.h"
@@ -6,28 +11,40 @@
 using namespace std;
 
 LargeNum::LargeNum() {
-	LN_Integer = string();
-	LN_Fraction = string();
+	LN_Integer = "0";
+	LN_Fraction = "0";
 }
 LargeNum::LargeNum(int INum) {
 	char *temp;
 	itoa(INum, temp, 10);
 	LN_Integer = string(temp);
-	LN_Fraction = string();
+	LN_Fraction = "0";
 }
 LargeNum::LargeNum(string strNum) {
 	if (!validStr(strNum)) {
 		cout << "ERROR: Invalid Number" << endl;
 		cout << "Exiting" << endl;
+		exit(-1);
 	}
 	else {
 		int decimalPointLoc = 0;
 		for (decimalPointLoc; decimalPointLoc < strNum.size(); decimalPointLoc++) {
-			
+			if (strNum[decimalPointLoc] == '.') {
+				LN_Integer = strNum.substr(0, decimalPointLoc);
+				LN_Fraction = strNum.substr(decimalPointLoc + 1, strNum.size());
+				break;
+			}
 		}
 	}
 }
-LargeNum::LargeNum(float fnum) {}
+LargeNum::LargeNum(float fnum) {
+	int Integer = (int)fnum;
+	char* temp;
+	itoa(Integer, temp, 10);
+	LN_Integer = string(temp);
+
+
+}
 
 
 LargeNum LargeNum::pow(const LargeNum& num, int n) {
@@ -40,32 +57,44 @@ ostream& operator<<(ostream& out, LargeNum& num) {
 	return out;
 }
 //Arithmatic operators
-LargeNum LargeNum::operator+(const LargeNum& num1, const LargeNum& num2) {
-
+LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
+	
 }
-LargeNum LargeNum::operator-(const LargeNum& num1, const LargeNum& num2) {}
-LargeNum LargeNum::operator*(const LargeNum& num1, const LargeNum& num2) {}
-LargeNum LargeNum::operator/(const LargeNum& num1, const LargeNum& num2) {}
+LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {}
+LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {}
+LargeNum operator/(const LargeNum& num1, const LargeNum& num2) {}
 
 //boolean Operators
-bool LargeNum::operator==(const LargeNum& num1, const LargeNum& num2) {
+bool operator==(const LargeNum& num1, const LargeNum& num2) {
+	//copies the two LargeNumber for comparison
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
+	//remove non-significant zeros from the copies
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
-	if((num1_copy.LN_Integer.size() == num2_copy.LN_Integer.size() ) && (
-		num1_copy.LN_Fraction.size() == num2_copy.LN_Fraction.size() )){
-				string::iterator num1Itr = num1_copy.LN_Integer.begin();
-				string::iterator num2Itr = num2_copy.LN_Integer.begin();
-				for(; num1Itr != num1_copy.LN_Integer.end() || num2Itr != num2_copy.LN_Integer.end();
+	//gets a copy of the Integer and fraction part of the number to be used
+	string num1_Int = num1_copy.getInteger();
+	string num1_Frac = num1_copy.getFraction();
+	string num2_Int = num1_copy.getInteger();
+	string num2_Frac = num1_copy.getFraction();
+
+	//checks if the two number are the same length
+	if((num1_Int.size() == num2_Int.size() ) && (
+		//if the two number are the same length then check of all digits are the same
+		num1_Frac.size() == num2_Frac.size() )){
+				string::iterator num1Itr = num1_Int.begin();
+				string::iterator num2Itr = num2_Int.begin();
+				//checks if the integer part is the same
+				for(; num1Itr != num1_Int.end() || num2Itr != num2_Int.end();
 					 ++num1Itr, ++num2Itr ){
 					if( *num1Itr != *num2Itr){
 						return false;
 					}
 				}
-				num1Itr = num1_copy.LN_Fraction.begin();
-				num2Itr = num2_copy.LN_Fraction.begin();
-				for(; num1Itr != LN_Fraction.end() || num2Itr != num2_copy.LN_Fraction.end();
+				num1Itr = num1_Frac.begin();
+				num2Itr = num2_Frac.begin();
+				//checks of the fraction part is the same
+				for(; num1Itr != num1_Frac.end() || num2Itr != num2_Frac.end();
 					 ++num1Itr, ++num2Itr){
 					if(*num1Itr != *num2Itr){
 						return false;
@@ -73,38 +102,49 @@ bool LargeNum::operator==(const LargeNum& num1, const LargeNum& num2) {
 				}
 				return true;
 	}else{
+		//if the two number are not the same
 		return false;
 	}
 }
-bool LargeNum::operator<=(const LargeNum& num1, const LargeNum& num2) {
+bool operator<=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 < num2 || num1 == num2 ){
 		return true;
 	}else{
 		return false;
 	}
 }
-bool LargeNum::operator>=(const LargeNum& num1, const LargeNum& num2) {
+bool operator>=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 > num2 || num1 == num2){
 		return true;
 	}else{
 		return false;
 	}
 }
-bool LargeNum::operator!=(const LargeNum& num1, const LargeNum& num2) {
+bool operator!=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 == num2 ){
 		return false;
 	}else{
 		return true;
 	}
 }
-bool LargeNum::operator>(const LargeNum& num1, const LargeNum& num2) {
-	if(num1.LN_Integer.size() > num2.LN_Integer.size()){
+bool operator>(const LargeNum& num1, const LargeNum& num2) {
+	//copies the two LargeNumber for comparison
+	LargeNum num1_copy = num1;
+	LargeNum num2_copy = num2;
+	//remove non-significant zeros from the copies
+	num1_copy.removeZeros();
+	num2_copy.removeZeros();
+	//gets a copy of the Integer and fraction part of the number to be used
+	string num1_Int = num1_copy.getInteger();
+	string num1_Frac = num1_copy.getFraction();
+	string num2_Int = num1_copy.getInteger();
+	string num2_Frac = num1_copy.getFraction();
 
 
-	}
+
 	return true;
 }
-bool LargeNum::operator<(const LargeNum& num2){
+bool operator<(const LargeNum& num1, const LargeNum& num2){
 
 	return true;
 }
@@ -118,9 +158,17 @@ LargeNum LargeNum::toLarge(int n) {
 	}
 	return Lnum;
 }
-LargeNum LargeNum::toLarge(float n) {}
-int LargeNum::toInt() {}
-float LargeNum::toFloat() {}
+LargeNum LargeNum::toLarge(float n) {
+
+}
+
+int LargeNum::toInt() {
+	return stoi(LN_Integer,nullptr,1);
+}
+float LargeNum::toFloat() {
+	string full_Num = LN_Integer + "." + LN_Fraction;
+	return stof(full_Num);
+}
 
 bool LargeNum::validStr(string s) {
 	int numberOfDecimalPoints = 0;
@@ -133,9 +181,6 @@ bool LargeNum::validStr(string s) {
 			else {
 				return false;
 			}
-		}
-		else {
-			return false;
 		}
 	}
 	return true;
@@ -160,4 +205,11 @@ void LargeNum::removeLeadingZeros(){
 	while(LN_Fraction.back() != '0' && LN_Fraction.size() > 1){
 		LN_Fraction.erase(LN_Fraction.size()-1, 1);
 	}
+}
+
+string LargeNum::getInteger() {
+	return LN_Integer;
+}
+string LargeNum::getFraction() {
+	return LN_Fraction;
 }

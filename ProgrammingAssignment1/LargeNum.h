@@ -47,6 +47,8 @@ class LargeNum{
         void removeZeros();
         void removeTailingZeros();
         void removeLeadingZeros();
+		string getInteger();
+		string getFraction();
 private:
 		static bool validStr(string s);
 };
