@@ -52,7 +52,6 @@ LargeNum::LargeNum(float fnum) {
 	}
 }
 
-
 LargeNum LargeNum::pow(const LargeNum& num, int n) {
 	//add code here
 	LargeNum product = num;
@@ -67,20 +66,82 @@ ostream& operator<<(ostream& out, LargeNum& num) {
 	return out;
 }
 //Arithmatic operators
+
+//complete
 LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
+	//create copyies
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
-	LargeNum sum = LargeNum();
 	LargeNum::matchLength(num1_copy, num2_copy);
+	//initialize the result
+	LargeNum sum = LargeNum();
+	LargeNum::matchLength(num1_copy, sum);
 
-	for
+	string num1_string = num1_copy.LN_Fraction;
+	string num2_string = num2_copy.LN_Fraction;
+	string sum_string = sum.LN_Fraction;
+	int carry = 0;
+	string::reverse_iterator num1Iter = num1_string.rbegin;
+	string::reverse_iterator num2Iter = num2_string.rbegin;
+	string::reverse_iterator sumIter = sum_string.rbegin;
+	//This loop through the fraction protion of the number
+	for (; num1Iter != num1_string.rend(); ++num1Iter, ++num2Iter, ++sumIter) {
+		//Sums the the current column of the number and adding the carry
+		int c = (*num1Iter - '0') + (*num2Iter - '0') + carry;
+		//tests if the sum of the column is greater then 9
+		if (c > 9) {
+			//if true, then the remainder is put into the sum column and the rest is put into carry
+			*sumIter = c % 10;
+			carry = c / 10;
+		}
+		else {
+			//if not greater then 9 then it is put into sum column
+			*sumIter = char(c + '0');
+		}
+	}
+
+	num1_string = num1_copy.LN_Integer;
+	num2_string = num2_copy.LN_Integer;
+	sum_string = sum.LN_Integer;
+	num1Iter = num1_string.rbegin;
+	num2Iter = num2_string.rbegin;
+	sumIter = sum_string.rbegin;
+	//this loops thorugh the integer protion of the number
+	for (; num1Iter != num1_string.rend(); ++num1Iter, ++num2Iter, ++sumIter) {
+		//Sums the the current column of the number and adding the carry
+		int c = (*num1Iter - '0') + (*num2Iter - '0') + carry;
+		//tests if the sum of the column is greater then 9
+		if (c > 9) {
+			//if true, then the remainder is put into the sum column and the rest is put into carry
+			*sumIter = c % 10;
+			carry = c / 10;
+		}
+		else {
+			//if not greater then 9 then it is put into sum column
+			*sumIter = char(c + '0');
+		}
+	}
+	return sum;
+}
+
+LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
+	LargeNum num1_copy = num1;
+	LargeNum num2_copy = num2;
+	LargeNum::matchLength(num1_copy, num2_copy);
+	LargeNum difference = LargeNum();
+	LargeNum::matchLength(num1_copy, difference);
+	string::iterator num1Iter, num2Iter, sumIter;
+
+
 
 }
-LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {}
+
 LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {}
+
 LargeNum operator/(const LargeNum& num1, const LargeNum& num2) {}
 
 //boolean Operators
+//complete
 bool operator==(const LargeNum& num1, const LargeNum& num2) {
 	//copies the two LargeNumber for comparison
 	LargeNum num1_copy = num1;
@@ -89,10 +150,10 @@ bool operator==(const LargeNum& num1, const LargeNum& num2) {
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
 	//gets a copy of the Integer and fraction part of the number to be used
-	string num1_Int = num1_copy.getInteger();
-	string num1_Frac = num1_copy.getFraction();
-	string num2_Int = num1_copy.getInteger();
-	string num2_Frac = num1_copy.getFraction();
+	string num1_Int = num1_copy.LN_Integer;
+	string num1_Frac = num1_copy.LN_Fraction;
+	string num2_Int = num1_copy.LN_Integer;
+	string num2_Frac = num1_copy.LN_Fraction;
 
 	//checks if the two number are the same length
 	if((num1_Int.size() == num2_Int.size() ) && (
@@ -122,6 +183,7 @@ bool operator==(const LargeNum& num1, const LargeNum& num2) {
 		return false;
 	}
 }
+//complete
 bool operator<=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 < num2 || num1 == num2 ){
 		return true;
@@ -129,6 +191,7 @@ bool operator<=(const LargeNum& num1, const LargeNum& num2) {
 		return false;
 	}
 }
+//complete
 bool operator>=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 > num2 || num1 == num2){
 		return true;
@@ -136,6 +199,7 @@ bool operator>=(const LargeNum& num1, const LargeNum& num2) {
 		return false;
 	}
 }
+//complete
 bool operator!=(const LargeNum& num1, const LargeNum& num2) {
 	if( num1 == num2 ){
 		return false;
@@ -143,6 +207,7 @@ bool operator!=(const LargeNum& num1, const LargeNum& num2) {
 		return true;
 	}
 }
+//complete
 bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	//copies the two LargeNumber for comparison
 	LargeNum num1_copy = num1;
@@ -151,14 +216,51 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
 	//gets a copy of the Integer and fraction part of the number to be used
-	string num1_Int = num1_copy.getInteger();
-	string num1_Frac = num1_copy.getFraction();
-	string num2_Int = num1_copy.getInteger();
-	string num2_Frac = num1_copy.getFraction();
+	string num1_Int = num1_copy.LN_Integer;
+	string num1_Frac = num1_copy.LN_Fraction;
+	string num2_Int = num1_copy.LN_Integer;
+	string num2_Frac = num1_copy.LN_Fraction;
 
+	if (num1_copy.getIntegerSize() < num2_copy.getIntegerSize()) {
+		//if the length of num1's integer protion is less then num2's integer portion
+		//then we know num2 is greater
+		return false;
+	}
+	if (num1_copy.getIntegerSize() == num2_copy.getIntegerSize() ) {
+		string::iterator num1Iter = num1_copy.LN_Integer.begin();
+		string::iterator num2Iter = num2_copy.LN_Integer.begin();
+		//check if each intidudual character in the integer portion
+		for (; num1Iter != num1_copy.LN_Integer.end(); ++num1Iter, ++num2Iter) {
+			int c1 = *num1Iter - '0';
+			int c2 = *num2Iter - '0';
+			//if c1 is greater then c2 then we know the whole of num1 is greater then num2
+			if (c1 > c2) {
+				return true;
+			}
+			//if c2 is greater then c1 then we know the whole num2 is greater than num1
+			else if (c1 < c2) {
+				return false;
+			}
+		}
 
-
-	return true;
+		num1Iter = num1_copy.LN_Fraction.begin();
+		num2Iter = num2_copy.LN_Fraction.begin();
+		//check if each intidudual character in the fraction portion
+		for (; num1Iter != num1_copy.LN_Fraction.end(); ++num1Iter, ++num2Iter) {
+			int c1 = *num1Iter - '0';
+			int c2 = *num2Iter - '0';
+			//if c1 is greater then c2 then we know the whole of num1 is greater then num2
+			if (c1 > c2) {
+				return true;
+			}
+			//if c2 is greater then c1 then we know the whole num2 is greater than num1
+			else if (c1 < c2) {
+				return false;
+			}
+		}
+	}
+	//else the two numbers are equal
+	return false;
 }
 bool operator<(const LargeNum& num1, const LargeNum& num2){
 
@@ -266,6 +368,6 @@ int LargeNum::getIntegerSize() const{
 int LargeNum::getFractionSize() const{
 	return LN_Fraction.size();	
 }
-int LargeNum::Size(){
+int LargeNum::Size() const{
 	return LN_Integer.size() + LN_Fraction.size();
 }
