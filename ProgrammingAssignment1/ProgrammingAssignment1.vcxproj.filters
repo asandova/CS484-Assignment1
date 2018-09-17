@@ -26,9 +26,15 @@
     <ClCompile Include="LargeNum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Proability.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LargeNum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Proability.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
