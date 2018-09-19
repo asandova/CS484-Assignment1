@@ -11,11 +11,38 @@
 
 using namespace std;
 
+LargeNum& LargeNum::complement() const{
+	//This function preformes 9's complement on the given largeNumber
+	LargeNum complement = LargeNum();
+	LargeNum copy = *this;
+	matchLength(copy, complement);
+
+	string::reverse_iterator numIter = copy.LN_Fraction.rbegin(), 
+		compIter = complement.LN_Fraction.rbegin();
+	for (; numIter != copy.LN_Fraction.rend(); ++compIter, ++numIter) {
+		*compIter = '9' - *numIter + '0';
+	}
+
+	numIter = copy.LN_Integer.rbegin();
+	compIter = complement.LN_Integer.rbegin();
+	for (; numIter != copy.LN_Integer.rend(); ++compIter, ++numIter) {
+		*compIter = '9' - *numIter + '0';
+	}
+	return complement;
+}
+
 LargeNum::LargeNum() {
 	LN_Integer = "0";
 	LN_Fraction = "0";
+	negative = false;
 }
 LargeNum::LargeNum(int INum) {
+	if (INum < 0) {
+		negative = true;
+	}
+	else {
+		negative = false;
+	}
 	char *temp;
 	itoa(INum, temp, 10);
 	LN_Integer = string(temp);
@@ -29,9 +56,15 @@ LargeNum::LargeNum(string strNum) {
 	}
 	else {
 		int decimalPointLoc = 0;
+		negative = false;
+		int numBegin = 0;
 		for (decimalPointLoc; decimalPointLoc < strNum.size(); decimalPointLoc++) {
+			if (strNum[decimalPointLoc] == '-' && decimalPointLoc == 0) {
+				negative = true;
+				numBegin++;
+			}
 			if (strNum[decimalPointLoc] == '.') {
-				LN_Integer = strNum.substr(0, decimalPointLoc);
+				LN_Integer = strNum.substr(numBegin, decimalPointLoc);
 				LN_Fraction = strNum.substr(decimalPointLoc + 1, strNum.size());
 				break;
 			}
@@ -40,6 +73,10 @@ LargeNum::LargeNum(string strNum) {
 }
 LargeNum::LargeNum(float fnum) {
 	ostringstream sfloat;
+	if (fnum < 0) {
+		negative = true;
+		fnum *= -1;
+	}
 	sfloat << fnum;
 	string fullFloat = string(sfloat.str());
 
@@ -52,16 +89,19 @@ LargeNum::LargeNum(float fnum) {
 	}
 }
 
-LargeNum LargeNum::pow(const LargeNum& num, int n) {
+LargeNum& LargeNum::pow( int n) const {
 	//add code here
-	LargeNum product = num;
+	LargeNum product = *this;
 	for(int i = 1; i < n; i++){
-		product = num * product;
+		product = *this * product;
 	}
 	return product;
 }
 
 ostream& operator<<(ostream& out, LargeNum& num) {
+	if (num.negative) {
+		out << "-";
+	}
 	out << num.LN_Integer << "." << num.LN_Fraction;
 	return out;
 }
@@ -97,6 +137,7 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 		else {
 			//if not greater then 9 then it is put into sum column
 			*sumIter = char(c + '0');
+			carry = 0;
 		}
 	}
 
@@ -119,21 +160,23 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 		else {
 			//if not greater then 9 then it is put into sum column
 			*sumIter = char(c + '0');
+			carry = 0;
 		}
+	}
+	if (carry != 0) {
+		//appends the carry to the front if it was not zero
+		sum.LN_Integer = (char)(carry + '0') + sum.LN_Integer;
 	}
 	return sum;
 }
-
+//complete
 LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
+	//This substracts two large number objects.
+	//This subtraction does sums the num1 and the complement (9's complement) of num2
 	LargeNum num1_copy = num1;
-	LargeNum num2_copy = num2;
+	LargeNum num2_copy = num2.complement();
 	LargeNum::matchLength(num1_copy, num2_copy);
-	LargeNum difference = LargeNum();
-	LargeNum::matchLength(num1_copy, difference);
-	string::iterator num1Iter, num2Iter, sumIter;
-
-
-
+	return num1_copy + num2_copy;
 }
 
 LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {}
@@ -293,6 +336,9 @@ bool LargeNum::validStr(string s) {
 	string::iterator itr;
 	for (itr = s.begin(); itr != s.end(); ++itr) {
 		if (!isdigit(*itr)) {
+			if (*itr == '-' && itr == s.begin()) {
+				continue;
+			}
 			if (*itr == '.' && numberOfDecimalPoints < 1) {
 				numberOfDecimalPoints++;
 			}

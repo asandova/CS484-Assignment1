@@ -11,7 +11,8 @@ class LargeNum{
 	private:
 		string LN_Integer;
 		string LN_Fraction;
-
+		bool negative;
+		LargeNum& complement() const;
 	public:
 		//constructors
 		LargeNum();
@@ -19,7 +20,7 @@ class LargeNum{
 		LargeNum(string strNum);
 		LargeNum(float fnum);
 
-		static LargeNum pow(const LargeNum& num, int n);
+		LargeNum& pow(int n) const;
 
 		//print operator
 		friend ostream& operator<<(ostream& out, LargeNum& num);
