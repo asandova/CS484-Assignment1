@@ -32,8 +32,8 @@ LargeNum& LargeNum::complement() const{
 }
 
 LargeNum::LargeNum() {
-	LN_Integer = "0";
-	LN_Fraction = "0";
+	Numbers = "";
+	Exponent = 0;
 	negative = false;
 }
 LargeNum::LargeNum(int INum) {
@@ -45,8 +45,8 @@ LargeNum::LargeNum(int INum) {
 	}
 	char *temp;
 	itoa(INum, temp, 10);
-	LN_Integer = string(temp);
-	LN_Fraction = "0";
+	Numbers = string(temp);
+	Exponent = 0;
 }
 LargeNum::LargeNum(string strNum) {
 	if (!validStr(strNum)) {
@@ -55,17 +55,22 @@ LargeNum::LargeNum(string strNum) {
 		exit(-1);
 	}
 	else {
-		int decimalPointLoc = 0;
 		negative = false;
 		int numBegin = 0;
-		for (decimalPointLoc; decimalPointLoc < strNum.size(); decimalPointLoc++) {
-			if (strNum[decimalPointLoc] == '-' && decimalPointLoc == 0) {
+		for (int i = 0; i < strNum.size(); i++) {
+			if (strNum[i] == '-' && i == 0) {
 				negative = true;
 				numBegin++;
 			}
-			if (strNum[decimalPointLoc] == '.') {
-				LN_Integer = strNum.substr(numBegin, decimalPointLoc);
-				LN_Fraction = strNum.substr(decimalPointLoc + 1, strNum.size());
+			if (strNum[i] == '.') {
+				Exponent = strNum.size() - i;
+				if (negative) {
+					Exponent += i - 3;
+				}
+				else {
+					Exponent += i - 2;
+				}
+				Numbers = strNum.substr(numBegin, i) + strNum.substr(i + 1, strNum.size());
 				break;
 			}
 		}
@@ -81,10 +86,10 @@ LargeNum::LargeNum(float fnum) {
 	string fullFloat = string(sfloat.str());
 
 	for(int i = 0; i < fullFloat.size(); i++){
-		if(fullFloat[i] == '.'){
-			LN_Integer = fullFloat.substr(0, i);
-			LN_Fraction = fullFloat.substr(i+1, fullFloat.size());
-			return;
+		if (fullFloat[i] == '.') {
+			Exponent = ( fullFloat.size() - i ) + (i - 2);
+			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
+			break;
 		}
 	}
 }
@@ -140,33 +145,6 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 			carry = 0;
 		}
 	}
-
-	num1_string = num1_copy.LN_Integer;
-	num2_string = num2_copy.LN_Integer;
-	sum_string = sum.LN_Integer;
-	num1Iter = num1_string.rbegin;
-	num2Iter = num2_string.rbegin;
-	sumIter = sum_string.rbegin;
-	//this loops thorugh the integer protion of the number
-	for (; num1Iter != num1_string.rend(); ++num1Iter, ++num2Iter, ++sumIter) {
-		//Sums the the current column of the number and adding the carry
-		int c = (*num1Iter - '0') + (*num2Iter - '0') + carry;
-		//tests if the sum of the column is greater then 9
-		if (c > 9) {
-			//if true, then the remainder is put into the sum column and the rest is put into carry
-			*sumIter = c % 10;
-			carry = c / 10;
-		}
-		else {
-			//if not greater then 9 then it is put into sum column
-			*sumIter = char(c + '0');
-			carry = 0;
-		}
-	}
-	if (carry != 0) {
-		//appends the carry to the front if it was not zero
-		sum.LN_Integer = (char)(carry + '0') + sum.LN_Integer;
-	}
 	return sum;
 }
 //complete
@@ -179,7 +157,16 @@ LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
 	return num1_copy + num2_copy;
 }
 
-LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {}
+LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
+	LargeNum num1_copy = num1;
+	LargeNum num2_copy = num2;
+	LargeNum product = LargeNum();
+	num1_copy.removeZeros();
+	num2_copy.removeZeros();
+	LargeNum::matchLength(num1_copy, num2_copy);
+	
+	string::reverse_iterator num1Itr, num2Itr;
+}
 
 LargeNum operator/(const LargeNum& num1, const LargeNum& num2) {}
 
@@ -372,24 +359,7 @@ void LargeNum::removeLeadingZeros(){
 }
 
 void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
-	int integerDiff, fractionDiff;
-	if( num1.getIntegerSize() > num2.getIntegerSize() ){
-		integerDiff = num1.getIntegerSize() - num2.getIntegerSize(); 
-		num2.addZerostoFront(integerDiff);
-	}
-	else if( num1.getIntegerSize() < num2.getIntegerSize() ){
-		integerDiff = num2.getIntegerSize() - num1.getIntegerSize(); 
-		num1.addZerostoFront(integerDiff);
-	}
-
-	if( num1.getFractionSize() > num2.getFractionSize() ){
-		fractionDiff = num1.getFractionSize() - num2.getFractionSize();
-		num2.addZerostoEnd(fractionDiff);
-	}
-	else if( num1.getFractionSize() < num2.getFractionSize() ){
-		fractionDiff = num2.getFractionSize() - num1.getFractionSize();
-		num1.addZerostoEnd(fractionDiff);
-	}
+	
 }
 void LargeNum::addZerostoFront(int n){
 	string zeros = string(n,'0');

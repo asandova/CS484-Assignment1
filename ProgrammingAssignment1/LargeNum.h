@@ -9,10 +9,13 @@ using namespace std;
 
 class LargeNum{
 	private:
-		string LN_Integer;
-		string LN_Fraction;
+		//string LN_Integer;
+		//string LN_Fraction;
 		bool negative;
-		LargeNum& complement() const;
+
+		string Numbers;
+		int Exponent;
+
 	public:
 		//constructors
 		LargeNum();
@@ -58,6 +61,7 @@ class LargeNum{
 		int Size() const;
 private:
 		static bool validStr(string s);
+		LargeNum& complement() const;
 };
 
 #endif //LARGENUM_H
