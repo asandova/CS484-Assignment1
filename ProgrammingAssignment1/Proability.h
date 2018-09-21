@@ -4,7 +4,7 @@
 #include "LargeNum.h"
 #include <vector>
 
-std::vector<LargeNum> Factorials;
+extern std::vector<LargeNum> Factorials;
 
 LargeNum factorial(int);
 void expandFactorial(int n);

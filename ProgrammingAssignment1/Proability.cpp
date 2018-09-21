@@ -51,9 +51,9 @@ LargeNum Binomial(int n, int x, float p) {
 	LargeNum fact, success, fail;
 
 	fact = factorial(n) / (factorial(n - x)*factorial(x));
-	success = LargeNum::pow(successes, x);
+	success =success.pow(x);
 	fail = (LargeNum(1) - successes);
-	fail = LargeNum::pow(fail, n - x);
+	fail = fail.pow( n - x);
 
 	return result;
 }

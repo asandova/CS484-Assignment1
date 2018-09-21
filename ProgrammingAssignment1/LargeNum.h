@@ -44,8 +44,8 @@ class LargeNum{
 		friend bool operator>(const LargeNum& num1, const LargeNum& num2);
 		*/
 		//conversion methods
-		LargeNum toLarge(int n);
-		LargeNum toLarge(float n);
+		//LargeNum toLarge(int n);
+		//LargeNum toLarge(float n);
 		int toInt() const;
 		float toFloat() const;
 
@@ -55,10 +55,6 @@ class LargeNum{
 		static void matchLength(LargeNum& num1, LargeNum& num2);
 		void addZerostoFront(int n);
 		void addZerostoEnd(int n);
-		string getInteger();
-		string getFraction();
-		int getIntegerSize() const;
-		int getFractionSize() const;
 		int Size() const;
 private:
 		static bool validStr(string s);

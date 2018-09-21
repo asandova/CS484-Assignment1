@@ -11,9 +11,19 @@
 */
 
 #include <stdio.h>
+#include "LargeNum.h"
 
 using namespace std;
 
 int main() {
+	LargeNum t1 = LargeNum(155);
+	LargeNum t2 = LargeNum(251.250f);
+	LargeNum t3 = LargeNum("152.3256");
+
+	cout << t1 << endl;
+	cout << t2 << endl;
+	cout << t3 << endl;
+	LargeNum Sum = t1 + t2;
+	cout << Sum << endl;
 	return 0;
 }
