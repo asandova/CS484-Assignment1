@@ -15,6 +15,7 @@ class LargeNum{
 
 		string Numbers;
 		int Exponent;
+		int decimalLocation;
 
 	public:
 		//constructors

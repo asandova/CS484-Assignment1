@@ -28,8 +28,11 @@ LargeNum& LargeNum::complement() const{
 
 //complete-working
 LargeNum::LargeNum() {
-	Numbers = "0.0";
+	Numbers = "00";
 	Exponent = 0;
+	//this reperesents the location of the decimal point
+	//The number mean that the decimal is before the number at index n
+	decimalLocation = 1; 
 	negative = false;
 }
 //complete-working
@@ -48,6 +51,7 @@ LargeNum::LargeNum(int INum) {
 	//essentialy representing the number in scientific notation
 	//i.e. 123456 -> 1.23456e5
  	Exponent = Numbers.size()-1;
+	decimalLocation = 1;
 }
 //complete-working
 LargeNum::LargeNum(string strNum) {
@@ -65,6 +69,7 @@ LargeNum::LargeNum(string strNum) {
 				numBegin++;
 			}
 			if (strNum[i] == '.') {
+				decimalLocation = i-1;
 				Exponent = strNum.substr(numBegin, i-1).size();
 				Numbers = strNum.substr(numBegin, i) + strNum.substr(i + 1, strNum.size());
 				break;
@@ -86,6 +91,7 @@ LargeNum::LargeNum(float fnum) {
 
 	for(int i = 0; i < fullFloat.size(); i++){
 		if (fullFloat[i] == '.') {
+			decimalLocation = i;
 			Exponent = fullFloat.substr(1,i-1).size();
 			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
 			break;
@@ -126,7 +132,17 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 	//create copies
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
-	LargeNum::matchLength(num1_copy, num2_copy);
+	int exponentDiff = 0;
+	if( num1.Exponent > num2.Exponent ){
+		exponentDiff = num1.Exponent - num2.Exponent;
+		num1_copy.Exponent = num2.Exponent;
+		num1_copy.decimalLocation += exponentDiff;
+	}else if(num1.Exponent < num2.Exponent){
+		exponentDiff = num2.Exponent - num1.Exponent;
+		num2_copy.Exponent = num1.Exponent;
+		num2_copy.Exponent += exponentDiff;
+	}
+	//LargeNum::matchLength(num1_copy, num2_copy);
 	//initialize the result
 	LargeNum sum = LargeNum();
 	LargeNum::matchLength(num1_copy, sum);
@@ -392,6 +408,14 @@ void LargeNum::removeZeros(){
 void LargeNum::removeTailingZeros(){
 	//Removes all non-significant zeros in the Integer portion of the number
 	//If the number has no significant digits then it ignore one zeros before the decimal point
+	string::reverse_iterator itr;
+	for(itr = Numbers.rbegin(); itr != Numbers.rend(); ++itr){
+		if(*itr != '0' ||  Numbers.size() < Exponent+1){
+			return;
+		}else{
+			Numbers.pop_back();
+		}
+	}
 }
 
 void LargeNum::removeLeadingZeros(){
@@ -408,12 +432,25 @@ void LargeNum::removeLeadingZeros(){
 }
 
 void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
-	if(num1.Exponent > num2.Exponent){
-		num1.Exponent = num2.Exponent;
-	}else if( num1.Exponent < num2.Exponent ){
-		num2.Exponent = num2.Exponent;
+
+	//Finds where the current decimal point is then add the exponent to find
+	//the total numbers of integer and decimals in the number
+	int num1Ints = num1.Numbers.substr(0,num1.decimalLocation).size();
+	int num1Decimals = num1.Numbers.substr(num1.decimalLocation,num1.Size()).size();
+	int num2Ints = num2.Numbers.substr(0,num2.decimalLocation).size();;
+	int num2Decimals = num2.Numbers.substr(num2.decimalLocation, num2.Size()).size();;
+
+
+	//once found add zeros to the frond and back to make the two number the same length
+	if(num1Ints > num2Ints){
+		num2.addZerostoFront(num1Ints - num2Ints);
 	}else{
-		cout << "numbers are already the same exponent" << endl;
+		num1.addZerostoFront(num2Ints - num1Ints);
+	}
+	if(num1Decimals > num2Decimals){
+		num2.addZerostoEnd(num1Decimals - num2Decimals);
+	}else{
+		num1.addZerostoEnd(num2Decimals - num1Decimals);
 	}
 }
 void LargeNum::addZerostoFront(int n){
