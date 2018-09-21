@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include "LargeNum.h"
 
 using namespace std;
@@ -17,15 +18,9 @@ LargeNum& LargeNum::complement() const{
 	LargeNum copy = *this;
 	matchLength(copy, complement);
 
-	string::reverse_iterator numIter = copy.LN_Fraction.rbegin(), 
-		compIter = complement.LN_Fraction.rbegin();
-	for (; numIter != copy.LN_Fraction.rend(); ++compIter, ++numIter) {
-		*compIter = '9' - *numIter + '0';
-	}
-
-	numIter = copy.LN_Integer.rbegin();
-	compIter = complement.LN_Integer.rbegin();
-	for (; numIter != copy.LN_Integer.rend(); ++compIter, ++numIter) {
+	string::reverse_iterator numIter = copy.Numbers.rbegin(), 
+		compIter = complement.Numbers.rbegin();
+	for (; numIter != copy.Numbers.rend(); ++compIter, ++numIter) {
 		*compIter = '9' - *numIter + '0';
 	}
 	return complement;
@@ -39,6 +34,7 @@ LargeNum::LargeNum() {
 LargeNum::LargeNum(int INum) {
 	if (INum < 0) {
 		negative = true;
+		INum *= -1;
 	}
 	else {
 		negative = false;
@@ -46,7 +42,10 @@ LargeNum::LargeNum(int INum) {
 	char *temp;
 	itoa(INum, temp, 10);
 	Numbers = string(temp);
-	Exponent = 0;
+	//sets the exponent to the length of the number string - 1
+	//essentialy representing the number in scientific notation
+	//i.e. 123456 -> 1.23456 x 10^5
+ 	Exponent = Numbers.size() - 1;
 }
 LargeNum::LargeNum(string strNum) {
 	if (!validStr(strNum)) {
@@ -87,7 +86,7 @@ LargeNum::LargeNum(float fnum) {
 
 	for(int i = 0; i < fullFloat.size(); i++){
 		if (fullFloat[i] == '.') {
-			Exponent = ( fullFloat.size() - i ) + (i - 2);
+			Exponent = fullFloat.size() - 2;
 			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
 			break;
 		}
@@ -104,10 +103,19 @@ LargeNum& LargeNum::pow( int n) const {
 }
 
 ostream& operator<<(ostream& out, LargeNum& num) {
+	//Prints the first 50 digits after the decimal
 	if (num.negative) {
 		out << "-";
 	}
-	out << num.LN_Integer << "." << num.LN_Fraction;
+	out << num.Numbers[0] << ".";
+
+	if(num.Numbers.size() < 51){
+		out << num.Numbers.substr( 1, 51);
+	}else{
+	 out << num.Numbers.substr(1, num.Numbers.size());
+	}
+	out << "10^" << num.Exponent;
+
 	return out;
 }
 //Arithmatic operators
@@ -169,7 +177,7 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 }
 
 LargeNum operator/(const LargeNum& num1, const LargeNum& num2) {}
-
+/*
 //boolean Operators
 //complete
 bool operator==(const LargeNum& num1, const LargeNum& num2) {
@@ -296,7 +304,7 @@ bool operator<(const LargeNum& num1, const LargeNum& num2){
 
 	return true;
 }
-
+*/
 LargeNum LargeNum::toLarge(int n) {
 	string Lnum = string();
 	while (n > 0) {
@@ -310,12 +318,23 @@ LargeNum LargeNum::toLarge(float n) {
 
 }
 
-int LargeNum::toInt() {
-	return stoi(LN_Integer,nullptr,1);
+int LargeNum::toInt() const{
+	string ints;
+	ints = Numbers.substr(0, Numbers.size()-Exponent);
+	if(negative){
+		ints = "-" + ints;
+	}
+	return stoi( ints ,nullptr,1);
 }
-float LargeNum::toFloat() {
-	string full_Num = LN_Integer + "." + LN_Fraction;
-	return stof(full_Num);
+float LargeNum::toFloat() const{
+	string ints, decimals, sfloat;
+	ints = Numbers.substr(0, Numbers.size()-Exponent);
+	decimals = Numbers.substr(Exponent, Numbers.size());
+	sfloat = ints + "." + decimals;
+	if(negative){
+		sfloat = "-" + sfloat;
+	}
+	return stof(sfloat);
 }
 
 bool LargeNum::validStr(string s) {
@@ -345,29 +364,35 @@ void LargeNum::removeZeros(){
 void LargeNum::removeTailingZeros(){
 	//Removes all non-significant zeros in the Integer portion of the number
 	//If the number has no significant digits then it ignore one zeros before the decimal point
-	while(LN_Integer.front() != '0' && LN_Integer.size() > 1){
-		LN_Integer.erase(0,1);
-	}
 }
 
 void LargeNum::removeLeadingZeros(){
 	//Removes all non-signigicant zeros in the Fraction protion of the number
 	//If the number has no significat digits then it ignores one zero after the decimal point 
-	while(LN_Fraction.back() != '0' && LN_Fraction.size() > 1){
-		LN_Fraction.erase(LN_Fraction.size()-1, 1);
-	}
 }
 
 void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
-	
+	string num1Ints = num1.Numbers.substr(0,num1.Exponent+1);
+	string num1decimals = num1.Numbers.substr(num1.Exponent+1)
+	if(num1. > num2.Exponent){
+
+
+	}else if( num1.Exponent < num2.Exponent ){
+
+
+	}else{
+		cout << "numbers are already the same length" << endl;
+	}
 }
 void LargeNum::addZerostoFront(int n){
 	string zeros = string(n,'0');
-	LN_Integer = zeros + LN_Integer;
+	Numbers = zeros + Numbers;
+	Exponent -= n;
 }
 void LargeNum::addZerostoEnd(int n){
 	for(int i = 0; i < n; i++ ){
-		LN_Fraction.push_back('0');
+		Numbers.push_back('0');
+		Exponent++;
 	}
 }
 
