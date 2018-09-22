@@ -36,14 +36,12 @@ class LargeNum{
 		friend LargeNum operator/(const LargeNum& num1, const LargeNum& num2);
 
 		//boolean Operators
-		/*
 		friend bool operator==(const LargeNum& num1, const LargeNum& num2);
 		friend bool operator<=(const LargeNum& num1, const LargeNum& num2);
 		friend bool operator>=(const LargeNum& num1, const LargeNum& num2);
 		friend bool operator!=(const LargeNum& num1, const LargeNum& num2);
 		friend bool operator<(const LargeNum& num1, const LargeNum& num2);
 		friend bool operator>(const LargeNum& num1, const LargeNum& num2);
-		*/
 		//conversion methods
 		//LargeNum toLarge(int n);
 		//LargeNum toLarge(float n);
@@ -59,7 +57,7 @@ class LargeNum{
 		int Size() const;
 private:
 		static bool validStr(string s);
-		LargeNum& complement() const;
+		LargeNum complement() const;
+		void clear();
 };
-
 #endif //LARGENUM_H
