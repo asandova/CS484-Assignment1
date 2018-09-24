@@ -83,7 +83,6 @@ LargeNum::LargeNum(string strNum) {
 		}
 		decimalLocation = 1;
 		Exponent = 0;
-		Numbers = strNum + "0";
 	}
 }
 //complete-working
@@ -116,8 +115,18 @@ LargeNum::LargeNum(float fnum) {
 	}
 }
 
-LargeNum& LargeNum::pow( int n) const {
+LargeNum LargeNum::pow( int n) const {
 	//add code here
+	if (n == 1) {
+		return *this;
+	}
+	if (n == 0) {
+		return LargeNum(1);
+	}
+	if (n < 0) {
+		cout << "Does not support negative powers" << endl;
+		exit(2);
+	}
 	LargeNum product = *this;
 	for(int i = 1; i < n; i++){
 		product = *this * product;
@@ -207,6 +216,7 @@ LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
 
 }
 
+/*
 LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	if (num1 == LargeNum() || num2 == LargeNum()) {
 		return LargeNum();
@@ -231,6 +241,7 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	string::reverse_iterator stepLoopItr = step.Numbers.rbegin();
 	string::reverse_iterator stepItr;
 	int carry = 0;
+
 	for (num2Itr = num2_copy.Numbers.rbegin(); 
 			num2Itr != num2_copy.Numbers.rend(); ++num2Itr, ++stepLoopItr) {
 		stepItr = stepLoopItr;
@@ -248,35 +259,73 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 		}
 		if (carry > 0) {
 			//++stepItr;
-			*stepItr = carry + '0';
-			carry = 0;
+			if (stepItr != step.Numbers.rend()) {
+				*stepItr = carry + '0';
+				carry = 0;
+			}
+			else {
+				step.Numbers = (char)(carry + '0') + step.Numbers;
+				stepLoopItr = step.Numbers.rbegin();
+			}
 		}
 		product = product + step;
 		step.clear();
 	}
-	/*
-	for(int i = n1-1; i >= 0; i--){
-		int carry = 0;
-		int n1 = num1_copy.Numbers[i] - '0';
-		num2Index = 0;
-		for(int j = n2-1; j >= 0; j--){
-			int n2 = num2_copy.Numbers[j] - '0';
-			int sum = n1 * n2 + product.Numbers[num1Index + num2Index] + carry;
-			carry = sum/10;
-			product.Numbers[num1Index + num2Index] = sum % 10 + '0';
-			num2Index++;
-		}
-		if(carry > 0){
-			product.Numbers[num1Index + num2Index] += carry;
-		}
-		num1Index++;
-	}*/
+	if (carry > 0) {
+		product.Numbers = (char)(carry + '0') + product.Numbers;
+		product.Exponent++;
+		carry = 0;
+	}
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
 	product.Exponent = num1.Exponent + num2.Exponent;
 	product.decimalLocation = num1_copy.decimalLocation + num2.decimalLocation;
 	product.removeZeros();
 	return product;
+}*/
+
+LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
+	if (num1 == LargeNum() || num2 == LargeNum()) {
+		return LargeNum();
+	}
+	if (num1 == LargeNum(1)) {
+		return num2;
+	}
+	else if (num2 == LargeNum(1)) {
+		return num1;
+	}
+	LargeNum num1_copy = num1;
+	LargeNum num2_copy = num2;
+	num1_copy.removeZeros();
+	num2_copy.removeZeros();
+	string product = string( num1_copy.Size() + num2_copy.Size(), '0');
+
+	int num1Inx = 0;
+	int num2Inx = 0;
+
+	for (int i = 0; i < num1_copy.Size() - 1; i++) {
+		int carry = 0;
+		int n1 = num1_copy.Numbers[i] - '0';
+		num2Inx = 0;
+		for (int j = 0; i < num2_copy.Size() - 1; j++) {
+			int n2 = num2_copy.Numbers[j] - '0';
+			int c = n1 * n2 + (product[num1Inx + num2Inx]- '0') + carry;
+			product[num1Inx + num2Inx] = (c % 10) + '0';
+			carry = c / 10;
+			num2Inx++;
+		}
+		if (carry > 0) {
+			int v = product[num1Inx + num2Inx] - '0';
+			product[num1Inx + num2Inx] =  (v + carry) + '0' ;
+		}
+		num1Inx++;
+	}
+	LargeNum result = LargeNum();
+
+	result.Numbers = product;
+	result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
+	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
+	return result;
 }
 
 LargeNum operator/(const LargeNum& num, const LargeNum& div) {
@@ -478,7 +527,7 @@ void LargeNum::removeTailingZeros(){
 	//If the number has no significant digits then it ignore one zeros before the decimal point
 	string::reverse_iterator itr;
 	for(itr = Numbers.rbegin(); itr != Numbers.rend(); ++itr){
-		if(*itr != '0' ||  Numbers.size() < Exponent+1){
+		if(*itr != '0' ||  Numbers.size() < Exponent+decimalLocation){
 			return;
 		}else{
 			Numbers.pop_back();
@@ -503,9 +552,9 @@ void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
 	//the total numbers of integer and decimals in the number
 
 	int num1Ints = num1.Numbers.substr(0,num1.decimalLocation).size();
-	int num1Decimals = num1.Numbers.substr(num1.decimalLocation,num1.Size()).size();
+	int num1Decimals = num1.Numbers.substr(num1.decimalLocation-1,num1.Size()).size();
 	int num2Ints = num2.Numbers.substr(0,num2.decimalLocation ).size();;
-	int num2Decimals = num2.Numbers.substr(num2.decimalLocation, num2.Size()).size();;
+	int num2Decimals = num2.Numbers.substr(num2.decimalLocation-1, num2.Size()).size();;
 
 
 	//once found add zeros to the frond and back to make the two number the same length

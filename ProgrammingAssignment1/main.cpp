@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else {
-		LargeNum t1 = LargeNum(4);
+		LargeNum t1 = LargeNum(2);
 		LargeNum t2 = LargeNum(8);
 		//LargeNum t3 = LargeNum("1.3");
 		//LargeNum t3 = LargeNum("0.001");

@@ -24,7 +24,7 @@ class LargeNum{
 		LargeNum(string strNum);
 		LargeNum(float fnum);
 
-		LargeNum& pow(int n) const;
+		LargeNum pow(int n) const;
 
 		//print operator
 		friend ostream& operator<<(ostream& out, LargeNum& num);
