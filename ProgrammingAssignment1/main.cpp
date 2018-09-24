@@ -6,7 +6,7 @@
 
 	Purpose:
 		This is the main file for the CS484 programming assignment 1.
-		This assignment is to implementent our own Large Number class for computation
+		This assignment is to implementing our own Large Number class for computation
 		This assignment will also support Factorial and Binomial formulas that work natively with the custom Large Number class
 */
 
@@ -48,13 +48,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else {
-		LargeNum t1 = LargeNum(2);
-		LargeNum t2 = LargeNum(8);
+		LargeNum t1 = LargeNum(8.0f);
+		LargeNum t2 = LargeNum(2.0f);
 		//LargeNum t3 = LargeNum("1.3");
 		//LargeNum t3 = LargeNum("0.001");
 		//cout << t3 << endl;
 
-		LargeNum Q = t1.pow(10);
+		LargeNum Q = t1 / t2;
 		cout << Q << endl;
 		//LargeNum diff = t1 - t2;
 		//cout << diff << endl;

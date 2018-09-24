@@ -8,6 +8,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <cstdlib>
+#include <iomanip>
 #include "LargeNum.h"
 
 using namespace std;
@@ -81,6 +82,7 @@ LargeNum::LargeNum(string strNum) {
 				return;
 			}
 		}
+		Numbers = strNum + '0';
 		decimalLocation = 1;
 		Exponent = 0;
 	}
@@ -101,8 +103,8 @@ LargeNum::LargeNum(float fnum) {
 	}else{
 		negative = false;
 	}
-	sfloat.precision(2);
-	sfloat << fixed << fnum;
+	//sfloat.precision(2);
+	sfloat << fnum;
 	string fullFloat = string(sfloat.str());
 
 	for(int i = 0; i < fullFloat.size(); i++){
@@ -110,9 +112,12 @@ LargeNum::LargeNum(float fnum) {
 			decimalLocation = i;
 			Exponent = fullFloat.substr(1,i-1).size();
 			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
-			break;
+			return;
 		}
 	}
+	Numbers = fullFloat + '0';
+	Exponent = 0;
+	decimalLocation = fullFloat.size() - 1;
 }
 
 LargeNum LargeNum::pow( int n) const {
@@ -147,8 +152,8 @@ ostream& operator<<(ostream& out, LargeNum& num) {
 	}else{
 	 out << num.Numbers.substr(1, num.Numbers.size()) + "0";
 	}
-	if(num.Exponent+num.decimalLocation-1 > 0)
-		out << "e^" << num.Exponent+num.decimalLocation-1;
+	if(num.Exponent+num.decimalLocation > 0)
+		out << "e^" << num.Exponent+num.decimalLocation;
 
 	return out;
 }
@@ -302,27 +307,28 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 
 	int num1Inx = 0;
 	int num2Inx = 0;
-
-	for (int i = 0; i < num1_copy.Size() - 1; i++) {
+	int pos;
+	for (int i = num1_copy.Size() - 1; i >=0; i--) {
 		int carry = 0;
 		int n1 = num1_copy.Numbers[i] - '0';
 		num2Inx = 0;
-		for (int j = 0; i < num2_copy.Size() - 1; j++) {
+		for (int j = num2_copy.Size() - 1; j >=0; j--) {
 			int n2 = num2_copy.Numbers[j] - '0';
-			int c = n1 * n2 + (product[num1Inx + num2Inx]- '0') + carry;
-			product[num1Inx + num2Inx] = (c % 10) + '0';
+			pos = product.size()-1 - (num1Inx + num2Inx);
+			int c = n1 * n2 + (product[pos]- '0') + carry;
+			product[pos] = (c % 10) + '0';
 			carry = c / 10;
 			num2Inx++;
 		}
 		if (carry > 0) {
-			int v = product[num1Inx + num2Inx] - '0';
-			product[num1Inx + num2Inx] =  (v + carry) + '0' ;
+			int v = product[pos-1] - '0';
+			product[pos-1] =  (v + carry) + '0' ;
 		}
 		num1Inx++;
 	}
 	LargeNum result = LargeNum();
-
 	result.Numbers = product;
+	result.removeLeadingZeros();
 	result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
 	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
 	return result;
@@ -347,8 +353,8 @@ LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 		LargeNum LLoop;
 		while ( flag ) {
 			LLoop = LargeNum(loops);
-			LargeNum fit = sec * LLoop;
-			if ( fit >= num_copy) {
+			LargeNum fit = div * LLoop;
+			if ( fit >= sec) {
 				flag = 0;
 				break;
 			}
@@ -373,7 +379,8 @@ bool operator==(const LargeNum& num1, const LargeNum& num2) {
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
 	//checks if the two number are the same length
-	if(num1_copy.Exponent == num2_copy.Exponent ){
+	if(num1_copy.Exponent == num2_copy.Exponent &&
+		num1_copy.decimalLocation == num2_copy.decimalLocation){
 		if (num1_copy.Size() != num2_copy.Size()) {
 			return false;
 		}
@@ -437,10 +444,11 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	else if (num1_copy.Exponent > num2_copy.Exponent) {
 		return true;
 	}
-	if (num1_copy.Exponent == num2_copy.Exponent ) {
+	if (num1_copy.Exponent == num2_copy.Exponent && 
+		num1_copy.decimalLocation == num2_copy.decimalLocation) {
 		string::iterator num1Iter = num1_copy.Numbers.begin();
 		string::iterator num2Iter = num2_copy.Numbers.begin();
-		//check if each intidudual character in the integer portion
+		//check if each individual character in the integer portion
 		for (; num1Iter != num1_copy.Numbers.end(); ++num1Iter, ++num2Iter) {
 			int c1 = *num1Iter - '0';
 			int c2 = *num2Iter - '0';
