@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else {
-		LargeNum t1 = LargeNum(8.0f);
+		LargeNum t1 = LargeNum(0.02f);
 		LargeNum t2 = LargeNum(2.0f);
 		//LargeNum t3 = LargeNum("1.3");
 		//LargeNum t3 = LargeNum("0.001");
@@ -58,6 +58,8 @@ int main(int argc, char *argv[]) {
 		cout << Q << endl;
 		//LargeNum diff = t1 - t2;
 		//cout << diff << endl;
+		LargeNum answer = Binomial(5, 5, 0.5f);
+		cout << answer << endl;
 	}
 	return 0;
 }

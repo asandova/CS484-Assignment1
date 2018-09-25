@@ -14,7 +14,7 @@ class LargeNum{
 		bool negative;
 
 		string Numbers;
-		int Exponent;
+		//int Exponent;
 		int decimalLocation;
 
 	public:

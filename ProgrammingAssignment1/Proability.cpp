@@ -31,7 +31,7 @@ void expandFactorial(int n) {
 	}
 	else {
 		int dif = n - Factorials.size();
-		int current = Factorials.size();
+		int current = Factorials.size()+1;
 		for (int i = 0; i < dif; i++, current++) {
 			LargeNum temp = Factorials[current - 2] * current;
 			Factorials.push_back(temp);
@@ -67,10 +67,10 @@ LargeNum Binomial(int n, int x, float p) {
 	LargeNum fact, success, fail;
 
 	fact = factorial(n) / (factorial(n - x)*factorial(x));
-	success =success.pow(x);
+	success = success.pow(x);
 	fail = (LargeNum(1) - successes);
 	fail = fail.pow( n - x);
-
+	result = fact * fail * success;
 	return result;
 }
 

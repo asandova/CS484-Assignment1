@@ -25,7 +25,7 @@ LargeNum LargeNum::complement() const{
 	//cout << complement << endl;
 	LargeNum smallIncroment = LargeNum("0.0");
 	matchLength(complement, smallIncroment);
-	smallIncroment.Exponent = complement.Exponent;
+	//smallIncroment.Exponent = complement.Exponent;
 	smallIncroment.decimalLocation = complement.decimalLocation;
 	smallIncroment.Numbers.back() = '1';
 
@@ -35,7 +35,7 @@ LargeNum LargeNum::complement() const{
 //complete-working
 LargeNum::LargeNum() {
 	Numbers = "00";
-	Exponent = 0;
+	//Exponent = 0;
 	//this reperesents the location of the decimal point
 	//The number mean that the decimal is before the number at index n
 	decimalLocation = 1; 
@@ -56,7 +56,7 @@ LargeNum::LargeNum(int INum) {
 	//sets the exponent to the length of the number string - 1
 	//essentialy representing the number in scientific notation
 	//i.e. 123456 -> 1.23456e5
- 	Exponent = Numbers.size()-1;
+ 	//Exponent = Numbers.size()-1;
 	decimalLocation = Numbers.size();
 	Numbers = Numbers + '0';
 }
@@ -77,21 +77,21 @@ LargeNum::LargeNum(string strNum) {
 			}
 			if (strNum[i] == '.') {
 				decimalLocation = i;
-				Exponent = strNum.substr(numBegin, i-1).size();
+				//Exponent = strNum.substr(numBegin, i-1).size();
 				Numbers = strNum.substr(numBegin, i) + strNum.substr(i + 1, strNum.size());
 				return;
 			}
 		}
-		Numbers = strNum + '0';
+		Numbers = strNum;
 		decimalLocation = 1;
-		Exponent = 0;
+		//Exponent = 0;
 	}
 }
 //complete-working
 LargeNum::LargeNum(float fnum) {
 	if (fnum == 0) {
 		decimalLocation = 1;
-		Exponent = 0;
+		//Exponent = 0;
 		Numbers = "00";
 		negative = false;
 		return;
@@ -110,14 +110,14 @@ LargeNum::LargeNum(float fnum) {
 	for(int i = 0; i < fullFloat.size(); i++){
 		if (fullFloat[i] == '.') {
 			decimalLocation = i;
-			Exponent = fullFloat.substr(1,i-1).size();
+			//Exponent = fullFloat.substr(1,i-1).size();
 			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
 			return;
 		}
 	}
 	Numbers = fullFloat + '0';
-	Exponent = 0;
-	decimalLocation = fullFloat.size() - 1;
+	//Exponent = 0;
+	decimalLocation = fullFloat.size();
 }
 
 LargeNum LargeNum::pow( int n) const {
@@ -145,15 +145,20 @@ ostream& operator<<(ostream& out, LargeNum& num) {
 	if (num.negative) {
 		out << "-";
 	}
-	out << num.Numbers[0] << ".";
 
-	if(num.Numbers.size() > 51){
-		out << num.Numbers.substr( 1, 51);
+	if (num.decimalLocation > 0) {
+		out << num.Numbers.substr(0, num.decimalLocation);
 	}else{
-	 out << num.Numbers.substr(1, num.Numbers.size()) + "0";
+		out << "0";
 	}
-	if(num.Exponent+num.decimalLocation > 0)
-		out << "e^" << num.Exponent+num.decimalLocation;
+
+	out << ".";
+	if (num.Size() - num.decimalLocation > 0) {
+		out << num.Numbers.substr(num.decimalLocation, num.Size());
+	}
+	else {
+		out << "0";
+	}
 
 	return out;
 }
@@ -164,19 +169,6 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 	//create copies
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
-	int exponentDiff = 0;
-	int exponentMax = num1.Exponent;
-	if( num1.Exponent > num2.Exponent ){
-		exponentMax = num1.Exponent;
-		exponentDiff = num1.Exponent - num2.Exponent;
-		num1_copy.Exponent = num2.Exponent;
-		//num1_copy.decimalLocation += exponentDiff;
-	}else if(num1.Exponent < num2.Exponent){
-		exponentMax = num2.Exponent;
-		exponentDiff = num2.Exponent - num1.Exponent;
-		num2_copy.Exponent = num1.Exponent;
-		//num2_copy.decimalLocation += exponentDiff;
-	}
 	LargeNum::matchLength(num1_copy, num2_copy);
 	//initialize the result
 	LargeNum sum = LargeNum();
@@ -204,94 +196,29 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 	if(carry != 0){
 		sum.Numbers = char(carry +'0') + sum.Numbers; 
 	}
-	sum.decimalLocation -= exponentDiff;
-	sum.Exponent = exponentMax;
+
+	//sum.decimalLocation -= exponentDiff;
+	//sum.Exponent = exponentMax;
 	return sum;
 }
 //complete-working
 LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
 	//This substracts two large number objects.
 	//This subtraction does sums the num1 and the complement (9's complement) of num2
+	
 	LargeNum num1_copy = num1;
-	LargeNum num2_copy = num2.complement();
-	//LargeNum::matchLength(num1_copy, num2_copy);
+	LargeNum num2_copy = num2;
+	LargeNum::matchLength(num1_copy, num2_copy);
+	num2_copy = num2_copy.complement();
 	LargeNum differnce = num1_copy + num2_copy;
 	differnce.Numbers.erase(differnce.Numbers.begin());
 	return differnce;
 
 }
 
-/*
 LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
-	if (num1 == LargeNum() || num2 == LargeNum()) {
-		return LargeNum();
-	}
-	if (num1 == LargeNum(1)) {
-		return num2;
-	}
-	if (num2 == LargeNum(1)) {
-		return num1;
-	}
-
-	LargeNum num1_copy = num1;
-	LargeNum num2_copy = num2;
-	LargeNum product = LargeNum();
-	LargeNum step = LargeNum();
-	LargeNum::matchLength(num1_copy, num2_copy);
-	product.addZerostoFront(num1_copy.Size() * 2);
-	step.addZerostoFront(num1_copy.Size() * 2);
-
-	string::reverse_iterator num1Itr;
-	string::reverse_iterator num2Itr;
-	string::reverse_iterator stepLoopItr = step.Numbers.rbegin();
-	string::reverse_iterator stepItr;
-	int carry = 0;
-
-	for (num2Itr = num2_copy.Numbers.rbegin(); 
-			num2Itr != num2_copy.Numbers.rend(); ++num2Itr, ++stepLoopItr) {
-		stepItr = stepLoopItr;
-		for (num1Itr = num1_copy.Numbers.rbegin(); 
-				num1Itr != num1_copy.Numbers.rend(); ++num1Itr, ++stepItr) {
-			int c = (*num2Itr - '0') * (*num1Itr - '0') + carry;
-			if (c > 9) {
-				*stepItr = (c % 10) + '0'; 
-				carry = c / 10;
-			}
-			else {
-				*stepItr = c + '0';
-				carry = 0;
-			}
-		}
-		if (carry > 0) {
-			//++stepItr;
-			if (stepItr != step.Numbers.rend()) {
-				*stepItr = carry + '0';
-				carry = 0;
-			}
-			else {
-				step.Numbers = (char)(carry + '0') + step.Numbers;
-				stepLoopItr = step.Numbers.rbegin();
-			}
-		}
-		product = product + step;
-		step.clear();
-	}
-	if (carry > 0) {
-		product.Numbers = (char)(carry + '0') + product.Numbers;
-		product.Exponent++;
-		carry = 0;
-	}
-	num1_copy.removeZeros();
-	num2_copy.removeZeros();
-	product.Exponent = num1.Exponent + num2.Exponent;
-	product.decimalLocation = num1_copy.decimalLocation + num2.decimalLocation;
-	product.removeZeros();
-	return product;
-}*/
-
-LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
-	if (num1 == LargeNum() || num2 == LargeNum()) {
-		return LargeNum();
+	if (num1 == LargeNum(0) || num2 == LargeNum(0)) {
+		return LargeNum(0);
 	}
 	if (num1 == LargeNum(1)) {
 		return num2;
@@ -328,8 +255,8 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	}
 	LargeNum result = LargeNum();
 	result.Numbers = product;
-	result.removeLeadingZeros();
-	result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
+	result.removeZeros();
+	//result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
 	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
 	return result;
 }
@@ -343,28 +270,67 @@ LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 		return num;
 	}
 	LargeNum num_copy = num;
+	num_copy.Numbers.push_back('0');
 	LargeNum Quotient = LargeNum();
-	
-	for (int i = 1; i < num.Size(); i++) {
+	LargeNum numSec = LargeNum(num.Numbers.substr(0, 1));
+	for (int i = 1; i < num_copy.Size(); i++) {
 		int loops = 1;
-		string numSec = num.Numbers.substr(0,i);
-		LargeNum sec = LargeNum(numSec);
 		int flag = 1;
 		LargeNum LLoop;
-		while ( flag ) {
+		while (flag) {
 			LLoop = LargeNum(loops);
 			LargeNum fit = div * LLoop;
-			if ( fit >= sec) {
+			fit.removeZeros();
+			numSec.removeZeros();
+			if (fit >= numSec) {
+				if (fit > numSec) {
+					loops -= 1;
+					LLoop = LargeNum(loops);
+				}
 				flag = 0;
 				break;
 			}
 			loops++;
 		}
-		Quotient.Numbers.push_back(loops + '0');
-		num_copy = num_copy - (sec * LLoop);
+		if (loops == 0) {
+			Quotient.Numbers.push_back('0');
+			numSec.Numbers.push_back(num_copy.Numbers[i]);
+			numSec.decimalLocation++;
+			if (i + 1 == num_copy.Size() && numSec != LargeNum(0)) {
+				num_copy.Numbers.push_back('0');
+				numSec.decimalLocation--;
+			}
+		}
+		else if (loops == 1) {
+			Quotient.Numbers.push_back('1');
+			LargeNum temp = div * LLoop;
+			numSec = numSec - temp;
+			numSec.Numbers[numSec.Size() - 1] = num_copy.Numbers[i];
+			if (i + 1 == num_copy.Size() && numSec != LargeNum(0)) {
+				num_copy.Numbers.push_back('0');
+			}
+			numSec.decimalLocation++;
+		}
+		else {
+			Quotient.Numbers.push_back(loops + '0');
+			LargeNum temp = div * LLoop;
+			//cout << temp << endl;
+			temp.removeZeros();
+			numSec = numSec - temp;
+			numSec.removeZeros();
+			if (numSec == LargeNum(0)) {
+				numSec = LargeNum(num_copy.Numbers[i] - '0');
+			}
+			else {
+				//numSec.Numbers[numSec.Size() - 1] = num_copy.Numbers[i];
+				numSec.Numbers.push_back(num_copy.Numbers[i]);
+				numSec.decimalLocation+=3;
+			}
+		}
 	}
 
-	Quotient.Exponent = num.Exponent - div.Exponent;
+	//Quotient.Exponent = num.Exponent - div.Exponent;
+	Quotient.decimalLocation = num.decimalLocation + div.decimalLocation+1;
 	Quotient.removeZeros();
 	return Quotient;
 }
@@ -378,26 +344,24 @@ bool operator==(const LargeNum& num1, const LargeNum& num2) {
 	//remove non-significant zeros from the copies
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
+	LargeNum::matchLength(num1_copy, num2_copy);
 	//checks if the two number are the same length
-	if(num1_copy.Exponent == num2_copy.Exponent &&
-		num1_copy.decimalLocation == num2_copy.decimalLocation){
-		if (num1_copy.Size() != num2_copy.Size()) {
-			return false;
-		}
-		string::iterator num1Itr = num1_copy.Numbers.begin();
-		string::iterator num2Itr = num2_copy.Numbers.begin();
-		//checks if the integer part is the same
-		for(; num1Itr != num1_copy.Numbers.end() || num2Itr != num2_copy.Numbers.end();
-				++num1Itr, ++num2Itr ){
-			if( *num1Itr != *num2Itr){
-				return false;
+	if (num1_copy.Size() == num2_copy.Size()) {
+		if (num1_copy.decimalLocation == num2_copy.decimalLocation) {
+			string::iterator num1Itr = num1_copy.Numbers.begin();
+			string::iterator num2Itr = num2_copy.Numbers.begin();
+			//checks if the integer part is the same
+			for (; num1Itr != num1_copy.Numbers.end() || num2Itr != num2_copy.Numbers.end();
+				++num1Itr, ++num2Itr) {
+				if (*num1Itr != *num2Itr) {
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
-	}else{
-		//if the two number are not the same
-		return false;
 	}
+	//if the two number are not the same
+	return false;
 }
 //complete
 bool operator<=(const LargeNum& num1, const LargeNum& num2) {
@@ -431,25 +395,20 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	//remove non-significant zeros from the copies
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
-	//gets a copy of the Integer and fraction part of the number to be used
-
-	if (num1_copy == num2_copy) {
-		return false;
-	}
-	else if (num1_copy.Exponent < num2_copy.Exponent) {
-		//if the length of num1's integer protion is less then num2's integer portion
-		//then we know num2 is greater
-		return false;
-	}
-	else if (num1_copy.Exponent > num2_copy.Exponent) {
+	string num1Sect = num1_copy.Numbers.substr(0, num1_copy.decimalLocation);
+	string num2Sect = num2_copy.Numbers.substr(0, num2_copy.decimalLocation);
+	
+	if (num1Sect.size() > num2Sect.size()) {
 		return true;
 	}
-	if (num1_copy.Exponent == num2_copy.Exponent && 
-		num1_copy.decimalLocation == num2_copy.decimalLocation) {
-		string::iterator num1Iter = num1_copy.Numbers.begin();
-		string::iterator num2Iter = num2_copy.Numbers.begin();
+	else if (num1Sect.size() < num2Sect.size()) {
+		return false;
+	}
+	else {
+		string::iterator num1Iter = num1Sect.begin();
+		string::iterator num2Iter = num2Sect.begin();
 		//check if each individual character in the integer portion
-		for (; num1Iter != num1_copy.Numbers.end(); ++num1Iter, ++num2Iter) {
+		for (; num1Iter != num1Sect.end(); ++num1Iter, ++num2Iter) {
 			int c1 = *num1Iter - '0';
 			int c2 = *num2Iter - '0';
 			//if c1 is greater then c2 then we know the whole of num1 is greater then num2
@@ -462,7 +421,32 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 			}
 		}
 	}
-	//else the two numbers are equal
+
+	num1Sect = num1_copy.Numbers.substr(num1_copy.decimalLocation,num1_copy.Size());
+	num2Sect = num2_copy.Numbers.substr(num2_copy.decimalLocation, num2_copy.Size());
+	if (num1Sect.size() > num2Sect.size()) {
+		return true;
+	}
+	else if (num1Sect.size() < num2Sect.size()) {
+		return false;
+	}
+	else {
+		string::iterator num1Iter = num1Sect.begin();
+		string::iterator num2Iter = num2Sect.begin();
+		//check if each individual character in the integer portion
+		for (; num1Iter != num1Sect.end(); ++num1Iter, ++num2Iter) {
+			int c1 = *num1Iter - '0';
+			int c2 = *num2Iter - '0';
+			//if c1 is greater then c2 then we know the whole of num1 is greater then num2
+			if (c1 > c2) {
+				return true;
+			}
+			//if c2 is greater then c1 then we know the whole num2 is greater than num1
+			else if (c1 < c2) {
+				return false;
+			}
+		}
+	}
 	return false;
 }
 bool operator<(const LargeNum& num1, const LargeNum& num2){
@@ -473,23 +457,9 @@ bool operator<(const LargeNum& num1, const LargeNum& num2){
 	}
 }
 
-/*
-LargeNum LargeNum::toLarge(int n) {
-	string Lnum = string();
-	while (n > 0) {
-		int temp = n % 10;
-		n /= 10;
-		Lnum += (char)('0' + temp);
-	}
-	return Lnum;
-}
-LargeNum LargeNum::toLarge(float n) {
-
-}*/
-
 int LargeNum::toInt() const{
 	string ints;
-	ints = Numbers.substr(0, Numbers.size()-Exponent);
+	ints = Numbers.substr(0, decimalLocation);
 	if(negative){
 		ints = "-" + ints;
 	}
@@ -497,8 +467,8 @@ int LargeNum::toInt() const{
 }
 float LargeNum::toFloat() const{
 	string ints, decimals, sfloat;
-	ints = Numbers.substr(0, Numbers.size()-Exponent);
-	decimals = Numbers.substr(Exponent, Numbers.size());
+	ints = Numbers.substr(0, decimalLocation);
+	decimals = Numbers.substr(decimalLocation, Numbers.size());
 	sfloat = ints + "." + decimals;
 	if(negative){
 		sfloat = "-" + sfloat;
@@ -533,12 +503,15 @@ void LargeNum::removeZeros(){
 void LargeNum::removeTailingZeros(){
 	//Removes all non-significant zeros in the Integer portion of the number
 	//If the number has no significant digits then it ignore one zeros before the decimal point
-	string::reverse_iterator itr;
-	for(itr = Numbers.rbegin(); itr != Numbers.rend(); ++itr){
-		if(*itr != '0' ||  Numbers.size() < Exponent+decimalLocation){
+	//string::reverse_iterator itr;
+	if (Numbers.size() == decimalLocation) {
+		return;
+	}
+
+	for(int i = Numbers.size()-1; i > 0 ; i--){
+		if (Numbers[i] != '0' || i == decimalLocation) {
+			Numbers = Numbers.erase(i+1, Numbers.size());
 			return;
-		}else{
-			Numbers.pop_back();
 		}
 	}
 }
@@ -547,8 +520,9 @@ void LargeNum::removeLeadingZeros(){
 	//Removes all non-signigicant zeros in the Fraction protion of the number
 	//If the number has no significat digits then it ignores one zero after the decimal point
 	for(int i = 0; i < Numbers.size(); i++){
-		if(Numbers[i] != '0'){
+		if(Numbers[i] != '0' || i+1 == decimalLocation){
 			Numbers = Numbers.erase(0, i);
+			decimalLocation -= i;
 			return;
 		}
 	}
@@ -585,7 +559,6 @@ void LargeNum::addZerostoFront(int n){
 void LargeNum::addZerostoEnd(int n){
 	for(int i = 0; i < n; i++ ){
 		Numbers.push_back('0');
-		Exponent++;
 	}
 }
 int LargeNum::Size() const{
