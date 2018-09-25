@@ -67,8 +67,8 @@ LargeNum Binomial(int n, int x, float p) {
 	LargeNum fact, success, fail;
 
 	fact = factorial(n) / (factorial(n - x)*factorial(x));
-	success = success.pow(x);
-	fail = (LargeNum(1) - successes);
+	success = successes.pow(x);
+	fail = (LargeNum(1.0f) - successes);
 	fail = fail.pow( n - x);
 	result = fact * fail * success;
 	return result;

@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 		cout << Q << endl;
 		//LargeNum diff = t1 - t2;
 		//cout << diff << endl;
-		LargeNum answer = Binomial(5, 5, 0.5f);
+		LargeNum answer = Binomial(10, 2, 0.5f);
 		cout << answer << endl;
 	}
 	return 0;

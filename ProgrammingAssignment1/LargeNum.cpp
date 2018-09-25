@@ -255,9 +255,9 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	}
 	LargeNum result = LargeNum();
 	result.Numbers = product;
+	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
 	result.removeZeros();
 	//result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
-	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
 	return result;
 }
 
@@ -308,8 +308,8 @@ LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 			numSec.Numbers[numSec.Size() - 1] = num_copy.Numbers[i];
 			if (i + 1 == num_copy.Size() && numSec != LargeNum(0)) {
 				num_copy.Numbers.push_back('0');
+				numSec.decimalLocation++;
 			}
-			numSec.decimalLocation++;
 		}
 		else {
 			Quotient.Numbers.push_back(loops + '0');
@@ -329,7 +329,6 @@ LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 		}
 	}
 
-	//Quotient.Exponent = num.Exponent - div.Exponent;
 	Quotient.decimalLocation = num.decimalLocation + div.decimalLocation+1;
 	Quotient.removeZeros();
 	return Quotient;
@@ -395,16 +394,17 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	//remove non-significant zeros from the copies
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
+	LargeNum::matchLength(num1_copy, num2_copy);
 	string num1Sect = num1_copy.Numbers.substr(0, num1_copy.decimalLocation);
 	string num2Sect = num2_copy.Numbers.substr(0, num2_copy.decimalLocation);
 	
-	if (num1Sect.size() > num2Sect.size()) {
-		return true;
-	}
-	else if (num1Sect.size() < num2Sect.size()) {
-		return false;
-	}
-	else {
+	//if (num1Sect.size() > num2Sect.size()) {
+	//	return true;
+	//}
+	//else if (num1Sect.size() < num2Sect.size()) {
+	//	return false;
+	//}
+	//else {
 		string::iterator num1Iter = num1Sect.begin();
 		string::iterator num2Iter = num2Sect.begin();
 		//check if each individual character in the integer portion
@@ -420,31 +420,23 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 				return false;
 			}
 		}
-	}
+	//}
 
-	num1Sect = num1_copy.Numbers.substr(num1_copy.decimalLocation,num1_copy.Size());
+	num1Sect = num1_copy.Numbers.substr(num1_copy.decimalLocation, num1_copy.Size());
 	num2Sect = num2_copy.Numbers.substr(num2_copy.decimalLocation, num2_copy.Size());
-	if (num1Sect.size() > num2Sect.size()) {
-		return true;
-	}
-	else if (num1Sect.size() < num2Sect.size()) {
-		return false;
-	}
-	else {
-		string::iterator num1Iter = num1Sect.begin();
-		string::iterator num2Iter = num2Sect.begin();
-		//check if each individual character in the integer portion
-		for (; num1Iter != num1Sect.end(); ++num1Iter, ++num2Iter) {
-			int c1 = *num1Iter - '0';
-			int c2 = *num2Iter - '0';
-			//if c1 is greater then c2 then we know the whole of num1 is greater then num2
-			if (c1 > c2) {
-				return true;
-			}
-			//if c2 is greater then c1 then we know the whole num2 is greater than num1
-			else if (c1 < c2) {
-				return false;
-			}
+	num1Iter = num1Sect.begin();
+	num2Iter = num2Sect.begin();
+	//check if each individual character in the integer portion
+	for (; num1Iter != num1Sect.end(); ++num1Iter, ++num2Iter) {
+		int c1 = *num1Iter - '0';
+		int c2 = *num2Iter - '0';
+		//if c1 is greater then c2 then we know the whole of num1 is greater then num2
+		if (c1 > c2) {
+			return true;
+		}
+		//if c2 is greater then c1 then we know the whole num2 is greater than num1
+		else if (c1 < c2) {
+			return false;
 		}
 	}
 	return false;
@@ -555,6 +547,7 @@ void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
 void LargeNum::addZerostoFront(int n){
 	string zeros = string(n,'0');
 	Numbers = zeros + Numbers;
+	decimalLocation += n;
 }
 void LargeNum::addZerostoEnd(int n){
 	for(int i = 0; i < n; i++ ){
