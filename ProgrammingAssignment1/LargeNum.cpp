@@ -261,7 +261,44 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	return result;
 }
 
-LargeNum operator/(const LargeNum& num, const LargeNum& div) {
+LargeNum operator/(const LargeNum& numerator, const LargeNum& divisor){
+	if(divisor == LargeNum(0)){
+		cout << "Cannot divide by zero" << endl;
+		exit(-1);
+	}
+	if(divisor == LargeNum(1)){
+		return numerator;
+	}
+
+
+	LargeNum Num = numerator;
+	Num.Numbers.push_back('0');
+	LargeNum Quotient = LargeNum();
+	LargeNum NumSect = LargeNum(Num.Numbers.substr(0,1));
+	for(int i = 1; i < Num.Size(); i++){
+		int loops = 1;
+		LargeNum temp = divisor * LargeNum(loops);
+		while(temp < NumSect){
+			temp = divisor * LargeNum(loops);
+			loops++;
+		}
+		if(loops == 1){
+			Quotient.Numbers.push_back('0');
+		}
+		if(loops > 1){
+			Quotient.Numbers.push_back( loops + '0' );
+			NumSect = NumSect - temp;
+			if(NumSect == LargeNum(0)){
+				//NumSect.Numbers[]
+			}else{
+				NumSect.Numbers.back() = Num.Numbers[i];
+				NumSect.decimalLocation++;
+			}
+		}
+	}
+}
+
+/*LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 	if (div == LargeNum(0)) {
 		cout << "Cannot divide by zero" << endl;
 		exit(-1);
@@ -332,7 +369,7 @@ LargeNum operator/(const LargeNum& num, const LargeNum& div) {
 	Quotient.decimalLocation = num.decimalLocation + div.decimalLocation+1;
 	Quotient.removeZeros();
 	return Quotient;
-}
+}*/
 
 //boolean Operators
 //complete
