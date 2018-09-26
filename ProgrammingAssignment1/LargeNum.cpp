@@ -53,9 +53,6 @@ LargeNum::LargeNum(int INum) {
 	ostringstream sInt;
 	sInt << INum;
 	Numbers = string(sInt.str());
-	//sets the exponent to the length of the number string - 1
-	//essentialy representing the number in scientific notation
-	//i.e. 123456 -> 1.23456e5
  	//Exponent = Numbers.size()-1;
 	decimalLocation = Numbers.size();
 	Numbers = Numbers + '0';
@@ -83,7 +80,7 @@ LargeNum::LargeNum(string strNum) {
 			}
 		}
 		Numbers = strNum;
-		decimalLocation = 1;
+		decimalLocation = strNum.size();
 		//Exponent = 0;
 	}
 }
@@ -208,6 +205,8 @@ LargeNum operator-(const LargeNum& num1, const LargeNum& num2) {
 	
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
+	num1_copy.removeZeros();
+	num2_copy.removeZeros();
 	LargeNum::matchLength(num1_copy, num2_copy);
 	num2_copy = num2_copy.complement();
 	LargeNum differnce = num1_copy + num2_copy;
@@ -269,33 +268,48 @@ LargeNum operator/(const LargeNum& numerator, const LargeNum& divisor){
 	if(divisor == LargeNum(1)){
 		return numerator;
 	}
-
-
 	LargeNum Num = numerator;
 	Num.Numbers.push_back('0');
-	LargeNum Quotient = LargeNum();
+	LargeNum Quotient = LargeNum("");
 	LargeNum NumSect = LargeNum(Num.Numbers.substr(0,1));
 	for(int i = 1; i < Num.Size(); i++){
 		int loops = 1;
 		LargeNum temp = divisor * LargeNum(loops);
 		while(temp < NumSect){
-			temp = divisor * LargeNum(loops);
 			loops++;
+			temp = divisor * LargeNum(loops);
 		}
-		if(loops == 1){
-			Quotient.Numbers.push_back('0');
+		if (temp == NumSect) {
+			Quotient.Numbers.push_back(loops + '0');
+			NumSect.Numbers = "0";
+			NumSect.Numbers.back() = Num.Numbers[i];
+			NumSect.decimalLocation = 1;
 		}
-		if(loops > 1){
-			Quotient.Numbers.push_back( loops + '0' );
-			NumSect = NumSect - temp;
-			if(NumSect == LargeNum(0)){
-				//NumSect.Numbers[]
-			}else{
-				NumSect.Numbers.back() = Num.Numbers[i];
+		else if (loops > 0) {
+			if (loops == 1) {
+				Quotient.Numbers.push_back('0');
+			}
+			else {
+				Quotient.Numbers.push_back( (loops-1) + '0' );
+				NumSect = temp - NumSect;
+			}
+			if (NumSect.Numbers.back() != '0') {
+				NumSect.Numbers.push_back(Num.Numbers[i]);
 				NumSect.decimalLocation++;
 			}
+			else {
+				NumSect.Numbers.back() = Num.Numbers[i];
+				//NumSect.decimalLocation++;
+			}
+		}
+		if (NumSect != LargeNum(0) && i + 1 == Num.Size()) {
+			Num.Numbers.push_back('0');
 		}
 	}
+	Quotient.removeLeadingZeros();
+	Quotient.decimalLocation = numerator.decimalLocation - divisor.decimalLocation;
+	Quotient.removeTailingZeros();
+	return Quotient;
 }
 
 /*LargeNum operator/(const LargeNum& num, const LargeNum& div) {
@@ -377,7 +391,6 @@ bool operator==(const LargeNum& num1, const LargeNum& num2) {
 	//copies the two LargeNumber for comparison
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
-	//remove non-significant zeros from the copies
 	num1_copy.removeZeros();
 	num2_copy.removeZeros();
 	LargeNum::matchLength(num1_copy, num2_copy);
@@ -428,20 +441,10 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 	//copies the two LargeNumber for comparison
 	LargeNum num1_copy = num1;
 	LargeNum num2_copy = num2;
-	//remove non-significant zeros from the copies
-	num1_copy.removeZeros();
-	num2_copy.removeZeros();
 	LargeNum::matchLength(num1_copy, num2_copy);
 	string num1Sect = num1_copy.Numbers.substr(0, num1_copy.decimalLocation);
 	string num2Sect = num2_copy.Numbers.substr(0, num2_copy.decimalLocation);
 	
-	//if (num1Sect.size() > num2Sect.size()) {
-	//	return true;
-	//}
-	//else if (num1Sect.size() < num2Sect.size()) {
-	//	return false;
-	//}
-	//else {
 		string::iterator num1Iter = num1Sect.begin();
 		string::iterator num2Iter = num2Sect.begin();
 		//check if each individual character in the integer portion
@@ -457,7 +460,6 @@ bool operator>(const LargeNum& num1, const LargeNum& num2) {
 				return false;
 			}
 		}
-	//}
 
 	num1Sect = num1_copy.Numbers.substr(num1_copy.decimalLocation, num1_copy.Size());
 	num2Sect = num2_copy.Numbers.substr(num2_copy.decimalLocation, num2_copy.Size());
@@ -561,11 +563,17 @@ void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
 
 	//Finds where the current decimal point is then add the exponent to find
 	//the total numbers of integer and decimals in the number
+	int num1Ints = 0, num1Decimals = 0;
+	int num2Ints = 0, num2Decimals = 0;
 
-	int num1Ints = num1.Numbers.substr(0,num1.decimalLocation).size();
-	int num1Decimals = num1.Numbers.substr(num1.decimalLocation-1,num1.Size()).size();
-	int num2Ints = num2.Numbers.substr(0,num2.decimalLocation ).size();;
-	int num2Decimals = num2.Numbers.substr(num2.decimalLocation-1, num2.Size()).size();;
+	if(num1.decimalLocation != 0)
+		num1Ints = num1.Numbers.substr(0,num1.decimalLocation).size();
+	if(num1.decimalLocation != num1.Size())
+		num1Decimals = num1.Numbers.substr(num1.decimalLocation,num1.Size()).size();
+	if(num2.decimalLocation != 0)
+		num2Ints = num2.Numbers.substr(0,num2.decimalLocation ).size();
+	if(num2.decimalLocation != num2.Size())
+		num2Decimals = num2.Numbers.substr(num2.decimalLocation, num2.Size()).size();;
 
 
 	//once found add zeros to the frond and back to make the two number the same length
@@ -577,7 +585,7 @@ void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
 
 	if(num1Decimals > num2Decimals){
 		num2.addZerostoEnd(num1Decimals - num2Decimals);
-	}else if(num1Decimals > num2Decimals){
+	}else if(num1Decimals < num2Decimals){
 		num1.addZerostoEnd(num2Decimals - num1Decimals);
 	}
 }
