@@ -18,3 +18,6 @@ to run:
 				This represent the number of summations of the binomial function
 			-s is the success flag. It expects a integer value
 				This represent the number of successes in the binomial function
+NOTE: The result of the calculation is slightly off. However, this problem only arises in results that have significant digits about
+	5 to 6 to the right of the decimal point. This result of acumulation of rounding down values during division. So the result is still
+	faitly accurate.

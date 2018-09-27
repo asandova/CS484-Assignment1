@@ -44,8 +44,10 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 		else {
-			LargeNum result = BinomialSum(trials, success, successProb);
-			cout << result << endl;
+			LargeNum resultSingle = Binomial(trials, success, successProb);
+			cout << "The proablity of a single Success: " << resultSingle << endl;
+			LargeNum resultSum = BinomialSum(trials, success, successProb);
+			cout << "The proablity of a Cumlative Success(x<="<< success <<"): " << resultSum << endl;
 		}
 	}
 	else {
@@ -71,7 +73,7 @@ int main(int argc, char *argv[]) {
 		//cout << diff << endl;
 		
 		LargeNum answer;
-		answer = Binomial(10, 3, 0.5f);
+		answer = Binomial(10, 3, 0.8f);
 		cout << answer << endl;
 		answer = BinomialSum(10, 3, 0.8f);
 		cout << answer << endl;
