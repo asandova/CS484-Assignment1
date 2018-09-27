@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <iomanip>
+#include <math.h>
 #include "LargeNum.h"
 
 using namespace std;
@@ -122,16 +123,22 @@ LargeNum LargeNum::pow( int n) const {
 	if (n == 1) {
 		return *this;
 	}
+	if (n == -1) {
+		return LargeNum(1) / *this;
+	}
 	if (n == 0) {
 		return LargeNum(1);
 	}
-	if (n < 0) {
-		cout << "Does not support negative powers" << endl;
-		exit(2);
-	}
+	//if (n < 0) {
+	//	cout << "Does not support negative powers" << endl;
+	//	exit(2);
+	//}
 	LargeNum product = *this;
-	for(int i = 1; i < n; i++){
+	for(int i = 1; i < abs(n) ; i++){
 		product = *this * product;
+	}
+	if (n < 0) {
+		product = LargeNum(1) / product;
 	}
 	return product;
 }
@@ -269,46 +276,65 @@ LargeNum operator/(const LargeNum& numerator, const LargeNum& divisor){
 		return numerator;
 	}
 	LargeNum Num = numerator;
+	LargeNum Div = divisor;
+	Num.removeZeros();
+	Div.removeZeros();
+	if (Div.getDecimals().size() > 0) {
+		if (Div.getDecimals().size() > 1) {
+			Num.decimalLocation += Div.decimalLocation;
+			Div.decimalLocation *= 2;
+		}
+		else if (Div.Numbers[Div.decimalLocation] != '0') {
+			Num.decimalLocation++;
+			Div.decimalLocation++;
+		}
+	}
+	Num.Numbers.push_back('0');
 	Num.Numbers.push_back('0');
 	LargeNum Quotient = LargeNum("");
-	LargeNum NumSect = LargeNum(Num.Numbers.substr(0,1));
+	//LargeNum NumSect = LargeNum(Num.Numbers.substr(0, 1));
+	string NumSect = Num.Numbers.substr(0, 1);
+	int extra = 5;
 	for(int i = 1; i < Num.Size(); i++){
 		int loops = 1;
-		LargeNum temp = divisor * LargeNum(loops);
-		while(temp < NumSect){
+		LargeNum temp = Div * LargeNum(loops);
+		while(temp < LargeNum(NumSect)){
 			loops++;
-			temp = divisor * LargeNum(loops);
+			temp = Div * LargeNum(loops);
 		}
 		if (temp == NumSect) {
 			Quotient.Numbers.push_back(loops + '0');
-			NumSect.Numbers = "0";
-			NumSect.Numbers.back() = Num.Numbers[i];
-			NumSect.decimalLocation = 1;
+			NumSect = "0";
+			NumSect.back() = Num.Numbers[i];
+			//NumSect.decimalLocation = 1;
 		}
 		else if (loops > 0) {
 			if (loops == 1) {
 				Quotient.Numbers.push_back('0');
+				NumSect.push_back(Num.Numbers[i]);
 			}
 			else {
 				Quotient.Numbers.push_back( (loops-1) + '0' );
-				NumSect = temp - NumSect;
+				temp = LargeNum(loops - 1) * Div;
+				NumSect = (LargeNum(NumSect) - temp).getInteger();
+				if (NumSect.back() != '0') {
+					NumSect.push_back(Num.Numbers[i]);
+				}
+				else {
+					NumSect.back() = Num.Numbers[i];
+				}
 			}
-			if (NumSect.Numbers.back() != '0') {
-				NumSect.Numbers.push_back(Num.Numbers[i]);
-				NumSect.decimalLocation++;
-			}
-			else {
-				NumSect.Numbers.back() = Num.Numbers[i];
-				//NumSect.decimalLocation++;
-			}
+			LargeNum hold = LargeNum(NumSect);
+			hold.removeLeadingZeros();
+			NumSect = hold.getInteger();
 		}
-		if (NumSect != LargeNum(0) && i + 1 == Num.Size()) {
+		if (LargeNum(NumSect) != LargeNum(0) && (i + 1 == Num.Size()|| i == Num.Size()) && extra > 0) {
 			Num.Numbers.push_back('0');
+			extra--;
 		}
 	}
-	Quotient.removeLeadingZeros();
-	Quotient.decimalLocation = numerator.decimalLocation - divisor.decimalLocation;
-	Quotient.removeTailingZeros();
+	Quotient.decimalLocation = Num.decimalLocation;
+	Quotient.removeZeros();
 	return Quotient;
 }
 
@@ -550,6 +576,10 @@ void LargeNum::removeTailingZeros(){
 void LargeNum::removeLeadingZeros(){
 	//Removes all non-signigicant zeros in the Fraction protion of the number
 	//If the number has no significat digits then it ignores one zero after the decimal point
+	if (decimalLocation == 0) {
+		return;
+	}
+
 	for(int i = 0; i < Numbers.size(); i++){
 		if(Numbers[i] != '0' || i+1 == decimalLocation){
 			Numbers = Numbers.erase(0, i);
@@ -601,6 +631,13 @@ void LargeNum::addZerostoEnd(int n){
 }
 int LargeNum::Size() const{
 	return Numbers.size();
+}
+
+string LargeNum::getInteger() {
+	return Numbers.substr(0, decimalLocation);
+}
+string LargeNum::getDecimals() {
+	return Numbers.substr(decimalLocation, Numbers.size());
 }
 
 void LargeNum::clear() {

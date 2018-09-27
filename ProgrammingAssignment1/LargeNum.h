@@ -56,6 +56,8 @@ class LargeNum{
 		void addZerostoEnd(int n);
 		int Size() const;
 private:
+		string getDecimals();
+		string getInteger();
 		static bool validStr(string s);
 		LargeNum complement() const;
 		void clear();

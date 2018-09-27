@@ -42,51 +42,51 @@ void expandFactorial(int n) {
 
 LargeNum Binomial(LargeNum n, LargeNum x, LargeNum p) {
 	LargeNum result;
-	LargeNum trials = n;
-	LargeNum successes = x;
+	//LargeNum trials = n;
+	//LargeNum successes = x;
 	LargeNum proability = p;
 	//Do something
 
-	LargeNum fact, success, fail;
+	LargeNum fact, successes, fail;
 
 	fact = factorial(n.toInt()) / (factorial( (n - x).toInt() )*factorial(x.toInt()));
-	success = success.pow(x.toInt());
-	fail = (LargeNum(1) - successes);
+	successes = proability.pow(x.toInt());
+	fail = (LargeNum(1) - proability);
 	fail = fail.pow( (n - x).toInt() );
-
+	result = fact * fail * successes;
 	return result;
 }
 
 LargeNum Binomial(int n, int x, float p) {
 	LargeNum result;
-	LargeNum trials = LargeNum(n);
-	LargeNum successes = LargeNum(x);
+	//LargeNum trials = LargeNum(n);
+	//LargeNum successes = LargeNum(x);
 	LargeNum proability = LargeNum(p);
 	//Do something
 
-	LargeNum fact, success, fail;
+	LargeNum fact, successes, fail;
 
 	fact = factorial(n) / (factorial(n - x)*factorial(x));
-	success = successes.pow(x);
-	fail = (LargeNum(1.0f) - successes);
+	successes = proability.pow(x);
+	fail = (LargeNum(1.0f) - proability);
 	fail = fail.pow( n - x);
-	result = fact * fail * success;
+	result = fact * fail *successes;
 	return result;
 }
 
 LargeNum BinomialSum(LargeNum n, LargeNum x, LargeNum p) {
-	LargeNum result = Binomial(n, 0, p);
+	LargeNum result = Binomial(n, x, p);
 	//Do something
-	for (int i = 1; i < x; i++) {
-		result = result + Binomial(n, i, p);
+	for (int i = 1; i < n; i++) {
+		result = result + Binomial(n, x, p);
 	}
 	return result;
 }
 LargeNum BinomialSum(int n, int x, float p) {
-	LargeNum result = Binomial(n,0,p);
+	LargeNum result = Binomial(n,x,p);
 	//Do something
-	for (int i = 1; i < x; i++) {
-		result = result + Binomial(n, i, p);
+	for (int i = 1; i < n; i++) {
+		result = result + Binomial(n, x, p);
 	}
 	return result;
 }

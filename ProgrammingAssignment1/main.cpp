@@ -49,18 +49,33 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else {
+		
 		LargeNum t1 = LargeNum(0.0123f);
-		LargeNum t2 = LargeNum(2);
+		LargeNum t2 = LargeNum(2.1f);
+		LargeNum t3 = LargeNum(12.47f);
+		LargeNum t4 = LargeNum(5.3f);
+		LargeNum t5 = LargeNum(0.25f);
+		LargeNum t6 = LargeNum(0.2f);
 		//LargeNum t3 = LargeNum("1.3");
 		//LargeNum t3 = LargeNum("0.001");
-		//cout << t3 << endl;
-
-		LargeNum Q = t1 / t2;
+		/*
+		LargeNum Q;
+		Q = t1 / t2;
 		cout << Q << endl;
+		Q = t3 / t4;
+		cout << Q << endl;
+		Q = t5 / t6;
+		cout << Q << endl;
+		*/
 		//LargeNum diff = t1 - t2;
 		//cout << diff << endl;
-		//LargeNum answer = Binomial(10, 2, 0.5f);
-		//cout << answer << endl;
+		
+		LargeNum answer;
+		answer = Binomial(10, 3, 0.5f);
+		cout << answer << endl;
+		answer = BinomialSum(10, 3, 0.8f);
+		cout << answer << endl;
+		
 	}
 	return 0;
 }
