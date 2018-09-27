@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
 
 	if (argc > 1) {
 		int i = 0;
-		string successProb = string();
-		string trials = string();
-		string success = string();
+		string successProb;
+		string trials;
+		string success;
 		while (i < argc) {
 			if ( strcmp(argv[i], "-p") == 0 ) {
 				successProb = string(argv[i + 1]);
@@ -40,13 +40,23 @@ int main(int argc, char *argv[]) {
 			i++;
 		}
 		if (successProb.empty() || trials.empty() || success.empty()) {
-			cout << "insufficent data passed";
+			cout << "insufficent data passed" << endl;
 			exit(1);
 		}
 		else {
-			LargeNum resultSingle = Binomial(trials, success, successProb);
+			//bandwidth of the link
+			//bandwidth of for each user
+			//Number of users = 
+			//proabiliy of user idle = q
+			//target number of users = IntegerSeccess
+
+			int IntSuccess = stoi(success,nullptr,10);
+			int IntTrials = stoi(trials,nullptr,10);
+			float FloatProb = stof(successProb,nullptr);
+
+			LargeNum resultSingle = Binomial(IntTrials, IntSuccess, FloatProb);
 			cout << "The proablity of a single Success: " << resultSingle << endl;
-			LargeNum resultSum = BinomialSum(trials, success, successProb);
+			LargeNum resultSum = BinomialSum(IntTrials, IntSuccess, FloatProb);
 			cout << "The proablity of a Cumlative Success(x<="<< success <<"): " << resultSum << endl;
 		}
 	}

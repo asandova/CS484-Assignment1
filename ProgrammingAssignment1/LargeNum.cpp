@@ -36,7 +36,6 @@ LargeNum LargeNum::complement() const{
 //complete-working
 LargeNum::LargeNum() {
 	Numbers = "00";
-	//Exponent = 0;
 	//this reperesents the location of the decimal point
 	//The number mean that the decimal is before the number at index n
 	decimalLocation = 1; 
@@ -89,7 +88,6 @@ LargeNum::LargeNum(string strNum) {
 LargeNum::LargeNum(float fnum) {
 	if (fnum == 0) {
 		decimalLocation = 1;
-		//Exponent = 0;
 		Numbers = "00";
 		negative = false;
 		return;
@@ -101,20 +99,17 @@ LargeNum::LargeNum(float fnum) {
 	}else{
 		negative = false;
 	}
-	//sfloat.precision(2);
 	sfloat << fnum;
 	string fullFloat = string(sfloat.str());
 
 	for(int i = 0; i < fullFloat.size(); i++){
 		if (fullFloat[i] == '.') {
 			decimalLocation = i;
-			//Exponent = fullFloat.substr(1,i-1).size();
 			Numbers = fullFloat.substr(0, i) + fullFloat.substr(i + 1, fullFloat.size());
 			return;
 		}
 	}
 	Numbers = fullFloat + '0';
-	//Exponent = 0;
 	decimalLocation = fullFloat.size();
 }
 
@@ -129,10 +124,6 @@ LargeNum LargeNum::pow( int n) const {
 	if (n == 0) {
 		return LargeNum(1);
 	}
-	//if (n < 0) {
-	//	cout << "Does not support negative powers" << endl;
-	//	exit(2);
-	//}
 	LargeNum product = *this;
 	for(int i = 1; i < abs(n) ; i++){
 		product = *this * product;
@@ -200,9 +191,6 @@ LargeNum operator+(const LargeNum& num1, const LargeNum& num2) {
 	if(carry != 0){
 		sum.Numbers = char(carry +'0') + sum.Numbers; 
 	}
-
-	//sum.decimalLocation -= exponentDiff;
-	//sum.Exponent = exponentMax;
 	return sum;
 }
 //complete-working
@@ -263,7 +251,6 @@ LargeNum operator*(const LargeNum& num1, const LargeNum& num2) {
 	result.Numbers = product;
 	result.decimalLocation = num1_copy.decimalLocation + num2_copy.decimalLocation;
 	result.removeZeros();
-	//result.Exponent = num1_copy.Exponent + num2_copy.Exponent;
 	return result;
 }
 
@@ -292,7 +279,6 @@ LargeNum operator/(const LargeNum& numerator, const LargeNum& divisor){
 	Num.Numbers.push_back('0');
 	Num.Numbers.push_back('0');
 	LargeNum Quotient = LargeNum("");
-	//LargeNum NumSect = LargeNum(Num.Numbers.substr(0, 1));
 	string NumSect = Num.Numbers.substr(0, 1);
 	int extra = 5;
 	for(int i = 1; i < Num.Size(); i++){
@@ -337,80 +323,6 @@ LargeNum operator/(const LargeNum& numerator, const LargeNum& divisor){
 	Quotient.removeZeros();
 	return Quotient;
 }
-
-/*LargeNum operator/(const LargeNum& num, const LargeNum& div) {
-	if (div == LargeNum(0)) {
-		cout << "Cannot divide by zero" << endl;
-		exit(-1);
-	}
-	if (div == LargeNum(1)) {
-		return num;
-	}
-	LargeNum num_copy = num;
-	num_copy.Numbers.push_back('0');
-	LargeNum Quotient = LargeNum();
-	LargeNum numSec = LargeNum(num.Numbers.substr(0, 1));
-	for (int i = 1; i < num_copy.Size(); i++) {
-		int loops = 1;
-		int flag = 1;
-		LargeNum LLoop;
-		while (flag) {
-			LLoop = LargeNum(loops);
-			LargeNum fit = div * LLoop;
-			fit.removeZeros();
-			numSec.removeZeros();
-			if (fit >= numSec) {
-				if (fit > numSec) {
-					loops -= 1;
-					LLoop = LargeNum(loops);
-				}
-				flag = 0;
-				break;
-			}
-			loops++;
-		}
-		if (loops == 0) {
-			Quotient.Numbers.push_back('0');
-			numSec.Numbers.push_back(num_copy.Numbers[i]);
-			numSec.decimalLocation++;
-			if (i + 1 == num_copy.Size() && numSec != LargeNum(0)) {
-				num_copy.Numbers.push_back('0');
-				numSec.decimalLocation--;
-			}
-		}
-		else if (loops == 1) {
-			Quotient.Numbers.push_back('1');
-			LargeNum temp = div * LLoop;
-			numSec = numSec - temp;
-			numSec.Numbers[numSec.Size() - 1] = num_copy.Numbers[i];
-			if (i + 1 == num_copy.Size() && numSec != LargeNum(0)) {
-				num_copy.Numbers.push_back('0');
-				numSec.decimalLocation++;
-			}
-		}
-		else {
-			Quotient.Numbers.push_back(loops + '0');
-			LargeNum temp = div * LLoop;
-			//cout << temp << endl;
-			temp.removeZeros();
-			numSec = numSec - temp;
-			numSec.removeZeros();
-			if (numSec == LargeNum(0)) {
-				numSec = LargeNum(num_copy.Numbers[i] - '0');
-			}
-			else {
-				//numSec.Numbers[numSec.Size() - 1] = num_copy.Numbers[i];
-				numSec.Numbers.push_back(num_copy.Numbers[i]);
-				numSec.decimalLocation+=3;
-			}
-		}
-	}
-
-	Quotient.decimalLocation = num.decimalLocation + div.decimalLocation+1;
-	Quotient.removeZeros();
-	return Quotient;
-}*/
-
 //boolean Operators
 //complete
 bool operator==(const LargeNum& num1, const LargeNum& num2) {
@@ -515,6 +427,7 @@ bool operator<(const LargeNum& num1, const LargeNum& num2){
 }
 
 int LargeNum::toInt() const{
+	//returns the current object in as a integer.
 	string ints;
 	ints = Numbers.substr(0, decimalLocation);
 	if(negative){
@@ -523,6 +436,7 @@ int LargeNum::toInt() const{
 	return stoi( ints ,nullptr,1);
 }
 float LargeNum::toFloat() const{
+	//returns the current object as a floating point value
 	string ints, decimals, sfloat;
 	ints = Numbers.substr(0, decimalLocation);
 	decimals = Numbers.substr(decimalLocation, Numbers.size());
@@ -534,6 +448,8 @@ float LargeNum::toFloat() const{
 }
 
 bool LargeNum::validStr(string s) {
+	//Checks of the passed in string represents a real number.
+	//Checks if there are alpha characters or multiple decimal points
 	int numberOfDecimalPoints = 0;
 	string::iterator itr;
 	for (itr = s.begin(); itr != s.end(); ++itr) {
@@ -560,7 +476,6 @@ void LargeNum::removeZeros(){
 void LargeNum::removeTailingZeros(){
 	//Removes all non-significant zeros in the Integer portion of the number
 	//If the number has no significant digits then it ignore one zeros before the decimal point
-	//string::reverse_iterator itr;
 	if (Numbers.size() == decimalLocation) {
 		return;
 	}
@@ -590,7 +505,6 @@ void LargeNum::removeLeadingZeros(){
 }
 
 void LargeNum::matchLength(LargeNum& num1, LargeNum& num2){
-
 	//Finds where the current decimal point is then add the exponent to find
 	//the total numbers of integer and decimals in the number
 	int num1Ints = 0, num1Decimals = 0;
