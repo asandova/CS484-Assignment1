@@ -6,11 +6,12 @@ to Compile:
 to run:
 	after using the makefile
 	a file "program1" will be generated.
-	to run type ./program1
-	The program accepts command line arguments
+	to run type "./program1"
+	The program only accepts command line arguments
 	example:
 		./program -p 0.1 -t 5 -s 2
-		The flags (these flags can be in any order, if multiple values with the same flag
+
+	The flags (these flags can be in any order, if multiple values with the same flag
 			are present, then farthest one to the right will be used ):
 			-p is the probability flag. It expects a decimal value between 1 and 0
 				This represents the probability value that will be used in the binomial sum
@@ -19,6 +20,19 @@ to run:
 			-s is the success flag. It expects a integer value
 				This represent the number of successes in the binomial function
 
+			-test:	is to run the program in a testing mode. 
+				Will take flags -p -t -s and just test the binomial functions.
+				will cause the program to ignore the active, idle, bwu and bwl flags
+
+			-active:	is the proability of a user being active. This value is a decimal value
+					Note: will cause an error when used with the -idle flag. 
+					This is bacause the idle value will be generated from the active value
+			-idle:	is the proability of a user being idle. This value is a decimal value
+					Note: will cause an error when used with the -active flag.
+					This is because the active value will be generated from the idle value
+			-bwu:	Is the user bandwidth value 
+			-bwl:	Is the link bandwidth value
+
 NOTE: The result of the calculation is slightly off. However, this is due to early termination of the division.
 	this is to prevent the it from calulating values when the quotient of two values that are irrational.
-	otherwise, it will round down values that have the decimal place longer then the numerator.
+	otherwise, it will round down values that have the decimal values longer then the numerator.
