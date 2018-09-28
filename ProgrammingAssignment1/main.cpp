@@ -35,11 +35,11 @@ int main(int argc, char *argv[]) {
 				successProb = string(argv[i + 1]);
 				i++;
 			}
-			if( strcmp(argv[i], "-t") == 0) {
+			if( strcmp(argv[i], "-total") == 0) {
 				Total = string(argv[i+1]);
 				i++;
 			}
-			if (strcmp(argv[i], "-s") == 0) {
+			if (strcmp(argv[i], "-tar") == 0) {
 				target = string(argv[i + 1]);
 				i++;
 			}
@@ -106,10 +106,16 @@ int main(int argc, char *argv[]) {
 			}
 			int targetVal = stoi(target, nullptr, 10);
 			int Totalval = stoi(Total, nullptr, 10);
+			
+			
 			LargeNum result;
 			result = BinomialSum( Totalval,targetVal-1,activeProb.toFloat());
 			result = LargeNum(1) - result;
-			cout << "The proabiliy of active users <=" << target <<": "<< result << endl;
+			cout << "Link connection: " << Link << "mb/s" << endl;
+			cout << "User connection: " << user << "mb/s" << endl << endl;
+			cout << "-----------------------------------------------------" << endl;
+			cout << "The Link can support up to: " << Link / user << "users";
+			cout << "The proabiliy of active users <=" << target << ": " << result << endl;
 		}
 	}
 
