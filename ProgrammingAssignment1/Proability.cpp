@@ -77,7 +77,7 @@ LargeNum Binomial(int n, int x, float p) {
 LargeNum BinomialSum(LargeNum n, LargeNum x, LargeNum p) {
 	LargeNum result = LargeNum(0);
 	//Do something
-	for (int i = 1; i < x; i++) {
+	for (int i = 0; i < x; i++) {
 		result = result + Binomial(n, i, p);
 	}
 	return result;
@@ -85,7 +85,7 @@ LargeNum BinomialSum(LargeNum n, LargeNum x, LargeNum p) {
 LargeNum BinomialSum(int n, int x, float p) {
 	LargeNum result = LargeNum(0);
 	//Do something
-	for (int i = 1; i <= x; i++) {
+	for (int i = 0; i <= x; i++) {
 		result = result + Binomial(n, i, p);
 	}
 	return result;

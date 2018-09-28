@@ -22,9 +22,12 @@ int main(int argc, char *argv[]) {
 	bool test = false;
 	bool active = false;
 	bool idle = false;
+	float Link;
+	float user;
 	string successProb;
-	string trials;
-	string success;
+	string failProb;
+	string Total;
+	string target;
 	if (argc > 1) {
 		int i = 0;
 		while (i < argc) {
@@ -33,11 +36,11 @@ int main(int argc, char *argv[]) {
 				i++;
 			}
 			if( strcmp(argv[i], "-t") == 0) {
-				trials = string(argv[i+1]);
+				Total = string(argv[i+1]);
 				i++;
 			}
 			if (strcmp(argv[i], "-s") == 0) {
-				success = string(argv[i + 1]);
+				target = string(argv[i + 1]);
 				i++;
 			}
 			if(strcmp(argv[i], "-test") ==0){
@@ -47,38 +50,44 @@ int main(int argc, char *argv[]) {
 				if(idle){
 					cout << "already genenerated active proability from idle value.\nIgnoring value" << endl;
 				}else{
-					
+					successProb = string(argv[i + 1]);
+					active = true;
+					i++;
 				}
 			}
 			if(strcmp(argv[i], "-idle") == 0){
 				if(active){
 					cout << "already genenerated idle proability from avtive value.\nIgnoring value" << endl;
 				}else{
-					
+					failProb = string(argv[i + 1]);
+					idle = true;
+					i++;
 				}
 			}
 			if(strcmp(argv[i], "-bwu") == 0){
-
+				user = stof(argv[i + 1], nullptr);
+				i++;
 			}
 			if(strcmp(argv[i], "-bwl") == 0){
-				
+				Link = stof(argv[i + 1], nullptr);
+				i++;
 			}
 
 			i++;
 		}
 		if(test){
-			if (successProb.empty() || trials.empty() || success.empty()) {
+			if (successProb.empty() || Total.empty() || target.empty()) {
 				cout << "insufficent data passed" << endl;
 				exit(1);
 			}else {
-				int IntSuccess = stoi(success,nullptr,10);
-				int IntTrials = stoi(trials,nullptr,10);
+				int IntSuccess = stoi(target,nullptr,10);
+				int IntTotal = stoi(Total,nullptr,10);
 				float FloatProb = stof(successProb,nullptr);
 
-				LargeNum resultSingle = Binomial(IntTrials, IntSuccess, FloatProb);
+				LargeNum resultSingle = Binomial(IntTotal, IntSuccess, FloatProb);
 				cout << "The proablity of a single Success: " << resultSingle << endl;
-				LargeNum resultSum = BinomialSum(IntTrials, IntSuccess, FloatProb);
-				cout << "The proablity of a Cumlative Success(x<="<< success <<"): " << resultSum << endl;
+				LargeNum resultSum = BinomialSum(IntTotal, IntSuccess, FloatProb);
+				cout << "The proablity of a Cumlative Success(x<="<< target <<"): " << resultSum << endl;
 				exit(0);
 			}
 		}
@@ -88,8 +97,19 @@ int main(int argc, char *argv[]) {
 			//Number of users = 
 			//proabiliy of user idle = q
 			//target number of users = IntegerSeccess
-
-
+			LargeNum activeProb;
+			if (active) {
+				activeProb = LargeNum(successProb);
+			}
+			else {
+				activeProb = LargeNum(1) - LargeNum(failProb);
+			}
+			int targetVal = stoi(target, nullptr, 10);
+			int Totalval = stoi(Total, nullptr, 10);
+			LargeNum result;
+			result = BinomialSum( Totalval,targetVal-1,activeProb.toFloat());
+			result = LargeNum(1) - result;
+			cout << "The proabiliy of active users <=" << target <<": "<< result << endl;
 		}
 	}
 
